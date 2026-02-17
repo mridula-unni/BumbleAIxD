@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Bumble</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,700;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --honey: oklch(0.85 0.16 85);
+  --honey-dark: oklch(0.72 0.16 80);
+  --honey-light: oklch(0.94 0.08 88);
+  --honey-glow: oklch(0.92 0.12 86);
+  --coral: oklch(0.72 0.14 25);
+  --sage: oklch(0.78 0.06 155);
+  --lavender: oklch(0.78 0.08 290);
+  --warm-50: oklch(0.98 0.005 80);
+  --warm-100: oklch(0.96 0.01 80);
+  --warm-200: oklch(0.92 0.015 80);
+  --warm-300: oklch(0.85 0.02 75);
+  --warm-400: oklch(0.65 0.03 70);
+  --warm-500: oklch(0.50 0.03 65);
+  --warm-600: oklch(0.35 0.025 60);
+  --warm-700: oklch(0.25 0.02 55);
+  --warm-800: oklch(0.18 0.015 50);
+  --warm-900: oklch(0.12 0.01 45);
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-full: 999px;
+  --shadow-sm: 0 1px 3px oklch(0.2 0.02 60 / 0.06);
+  --shadow-md: 0 4px 16px oklch(0.2 0.02 60 / 0.08);
+  --shadow-lg: 0 8px 32px oklch(0.2 0.02 60 / 0.12);
+  --shadow-card: 0 2px 20px oklch(0.2 0.02 60 / 0.1), 0 0 0 1px oklch(0.2 0.02 60 / 0.03);
+  --transition-fast: 180ms cubic-bezier(0.25, 0, 0, 1);
+  --transition-med: 320ms cubic-bezier(0.25, 0, 0, 1);
+  --transition-slow: 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+html, body {
+  height: 100%;
+  overflow: hidden;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--warm-800);
+  color: var(--warm-700);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* App Shell */
+.app-shell {
+  position: relative;
+  width: 100%;
+  max-width: 430px;
+  height: 100%;
+  max-height: 932px;
+  margin: 0 auto;
+  background: var(--warm-50);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-height: 933px) {
+  body { display: flex; align-items: center; justify-content: center; }
+  .app-shell { border-radius: 40px; border: 6px solid var(--warm-700); box-shadow: 0 24px 80px oklch(0.1 0.02 50 / 0.4); }
+}
+
+/* Screen Management */
+.screen {
+  position: absolute;
+  inset: 0;
+  bottom: 68px;
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--transition-med), transform var(--transition-med);
+  transform: translateY(8px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior: contain;
+}
+
+.screen.active {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.screen::-webkit-scrollbar { display: none; }
+
+/* ─── HEADER BAR ─── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  flex-shrink: 0;
+}
+
+.header-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--warm-800);
+  letter-spacing: -0.02em;
+}
+
+.header-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  background: var(--warm-100);
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.header-icon:hover { background: var(--warm-200); }
+
+.header-icon svg { width: 20px; height: 20px; color: var(--warm-600); }
+
+/* ─── SWIPE SCREEN ─── */
+.swipe-screen { overflow: hidden; }
+
+.card-stack {
+  flex: 1;
+  position: relative;
+  margin: 0 16px 16px;
+}
+
+.profile-card {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  background: var(--warm-200);
+  box-shadow: var(--shadow-card);
+  touch-action: none;
+  user-select: none;
+  will-change: transform;
+  cursor: grab;
+  transition: box-shadow var(--transition-fast);
+}
+
+.profile-card:active { cursor: grabbing; }
+
+.profile-card .card-photo {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center top;
+}
+
+.profile-card .card-gradient {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    oklch(0.12 0.01 45 / 0.95) 0%,
+    oklch(0.12 0.01 45 / 0.6) 30%,
+    transparent 55%
+  );
+}
+
+.card-info {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 24px 22px;
+}
+
+.card-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.75rem;
+  color: var(--warm-50);
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.card-name span {
+  font-weight: 300;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1.35rem;
+  margin-left: 6px;
+  opacity: 0.85;
+}
+
+.card-bio {
+  margin-top: 6px;
+  font-size: 0.88rem;
+  color: oklch(0.88 0.01 80);
+  line-height: 1.45;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.card-tag {
+  padding: 5px 12px;
+  border-radius: var(--radius-full);
+  background: oklch(0.98 0.01 80 / 0.15);
+  backdrop-filter: blur(8px);
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--warm-50);
+  border: 1px solid oklch(0.98 0.01 80 / 0.12);
+}
+
+/* Swipe feedback */
+.swipe-label {
+  position: absolute;
+  top: 28px;
+  padding: 10px 24px;
+  border-radius: var(--radius-md);
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 60ms linear;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.swipe-label.like {
+  right: 20px;
+  color: oklch(0.65 0.18 145);
+  border: 3px solid oklch(0.65 0.18 145);
+  transform: rotate(16deg);
+}
+
+.swipe-label.nope {
+  left: 20px;
+  color: var(--coral);
+  border: 3px solid var(--coral);
+  transform: rotate(-16deg);
+}
+
+/* Action Buttons */
+.swipe-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 12px 0 4px;
+  flex-shrink: 0;
+}
+
+.action-btn {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+  box-shadow: var(--shadow-md);
+}
+
+.action-btn:active { transform: scale(0.92); }
+
+.action-btn.pass {
+  background: var(--warm-50);
+  border: 2px solid var(--warm-200);
+}
+.action-btn.pass svg { color: var(--coral); width: 24px; height: 24px; }
+
+.action-btn.like-btn {
+  width: 64px;
+  height: 64px;
+  background: var(--honey);
+  border: none;
+}
+.action-btn.like-btn svg { color: var(--warm-50); width: 28px; height: 28px; }
+
+.action-btn.star {
+  background: var(--warm-50);
+  border: 2px solid var(--warm-200);
+}
+.action-btn.star svg { color: var(--lavender); width: 22px; height: 22px; }
+
+/* ─── MATCH OVERLAY ─── */
+.match-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: oklch(0.12 0.02 80 / 0.7);
+  backdrop-filter: blur(20px);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 400ms ease;
+}
+
+.match-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.match-content {
+  text-align: center;
+  padding: 40px 32px;
+  transform: scale(0.85);
+  transition: transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.match-overlay.visible .match-content { transform: scale(1); }
+
+.match-avatars {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 28px;
+}
+
+.match-avatar {
+  width: 100px;
+  height: 100px;
+  border-radius: var(--radius-full);
+  background-size: cover;
+  background-position: center;
+  border: 4px solid var(--honey);
+  box-shadow: 0 4px 24px oklch(0.85 0.16 85 / 0.3);
+}
+
+.match-avatar:last-child { margin-left: -20px; }
+
+.match-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 2.2rem;
+  color: var(--honey);
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.match-subtitle {
+  color: oklch(0.8 0.01 80);
+  font-size: 0.95rem;
+  margin-bottom: 32px;
+}
+
+.match-actions { display: flex; flex-direction: column; gap: 12px; }
+
+.match-btn {
+  padding: 16px 32px;
+  border-radius: var(--radius-full);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+}
+
+.match-btn:active { transform: scale(0.97); }
+
+.match-btn.primary {
+  background: var(--honey);
+  color: var(--warm-800);
+}
+
+.match-btn.secondary {
+  background: transparent;
+  color: oklch(0.8 0.01 80);
+  border: 1.5px solid oklch(0.5 0.01 80);
+}
+
+/* ─── MATCHES/CHAT LIST SCREEN ─── */
+.matches-row {
+  display: flex;
+  gap: 12px;
+  padding: 4px 20px 16px;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.matches-row::-webkit-scrollbar { display: none; }
+
+.match-bubble {
+  flex-shrink: 0;
+  text-align: center;
+  cursor: pointer;
+}
+
+.match-bubble-avatar {
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-full);
+  background-size: cover;
+  background-position: center;
+  border: 2.5px solid var(--honey);
+  margin-bottom: 6px;
+  transition: transform var(--transition-fast);
+}
+
+.match-bubble:active .match-bubble-avatar { transform: scale(0.93); }
+
+.match-bubble-name {
+  font-size: 0.72rem;
+  font-weight: 500;
+  color: var(--warm-500);
+}
+
+.section-label {
+  padding: 4px 20px 10px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--warm-400);
+}
+
+.chat-list { flex: 1; }
+
+.chat-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 20px;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.chat-item:active { background: var(--warm-100); }
+
+.chat-item-avatar {
+  width: 54px;
+  height: 54px;
+  border-radius: var(--radius-full);
+  background-size: cover;
+  background-position: center;
+  flex-shrink: 0;
+}
+
+.chat-item-info { flex: 1; min-width: 0; }
+
+.chat-item-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--warm-800);
+}
+
+.chat-item-preview {
+  font-size: 0.82rem;
+  color: var(--warm-400);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-top: 2px;
+}
+
+.chat-item-meta {
+  flex-shrink: 0;
+  text-align: right;
+}
+
+.chat-item-time {
+  font-size: 0.72rem;
+  color: var(--warm-400);
+}
+
+.chat-item-badge {
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  background: var(--honey);
+  color: var(--warm-800);
+  font-size: 0.68rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: auto;
+  margin-top: 4px;
+}
+
+/* ─── CHAT SCREEN ─── */
+.chat-screen {
+  z-index: 10;
+  bottom: 0;
+  background: var(--warm-50);
+}
+
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--warm-100);
+  flex-shrink: 0;
+}
+
+.chat-back {
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-full);
+  transition: background var(--transition-fast);
+}
+
+.chat-back:hover { background: var(--warm-100); }
+.chat-back svg { width: 22px; height: 22px; color: var(--warm-600); }
+
+.chat-header-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  background-size: cover;
+  background-position: center;
+}
+
+.chat-header-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: var(--warm-800);
+}
+
+.chat-header-status {
+  font-size: 0.72rem;
+  color: oklch(0.7 0.12 150);
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 20px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.chat-messages::-webkit-scrollbar { display: none; }
+
+.msg {
+  max-width: 78%;
+  padding: 12px 16px;
+  font-size: 0.9rem;
+  line-height: 1.45;
+  border-radius: 20px;
+  animation: msgIn 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes msgIn {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+.msg.sent {
+  align-self: flex-end;
+  background: var(--honey);
+  color: var(--warm-800);
+  border-bottom-right-radius: 6px;
+}
+
+.msg.received {
+  align-self: flex-start;
+  background: var(--warm-100);
+  color: var(--warm-700);
+  border-bottom-left-radius: 6px;
+}
+
+.msg-time-divider {
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--warm-400);
+  padding: 12px 0 6px;
+}
+
+.typing-indicator {
+  align-self: flex-start;
+  display: flex;
+  gap: 4px;
+  padding: 14px 18px;
+  background: var(--warm-100);
+  border-radius: 20px;
+  border-bottom-left-radius: 6px;
+}
+
+.typing-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--warm-400);
+  animation: typingBounce 1.4s ease-in-out infinite;
+}
+
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+@keyframes typingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-5px); opacity: 1; }
+}
+
+.chat-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px 28px;
+  border-top: 1px solid var(--warm-100);
+  flex-shrink: 0;
+  background: var(--warm-50);
+}
+
+.chat-input {
+  flex: 1;
+  padding: 12px 18px;
+  border-radius: var(--radius-full);
+  border: 1.5px solid var(--warm-200);
+  font-family: inherit;
+  font-size: 0.9rem;
+  background: var(--warm-100);
+  color: var(--warm-700);
+  outline: none;
+  transition: border-color var(--transition-fast);
+}
+
+.chat-input:focus { border-color: var(--honey); }
+
+.chat-input::placeholder { color: var(--warm-400); }
+
+.chat-send {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--honey);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform var(--transition-fast), opacity var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.chat-send:active { transform: scale(0.9); }
+.chat-send svg { width: 20px; height: 20px; color: var(--warm-800); }
+
+/* ─── PROFILE SCREEN ─── */
+.profile-screen { padding-bottom: 20px; }
+
+.profile-hero {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 8px 20px 24px;
+}
+
+.profile-photo {
+  width: 110px;
+  height: 110px;
+  border-radius: var(--radius-full);
+  background-size: cover;
+  background-position: center;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+}
+
+.profile-photo-edit {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-full);
+  background: var(--honey);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 3px solid var(--warm-50);
+}
+
+.profile-photo-edit svg { width: 14px; height: 14px; color: var(--warm-800); }
+
+.profile-name {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: var(--warm-800);
+  margin-top: 16px;
+  letter-spacing: -0.02em;
+}
+
+.profile-handle {
+  font-size: 0.85rem;
+  color: var(--warm-400);
+  margin-top: 2px;
+}
+
+.profile-section {
+  padding: 0 20px;
+  margin-bottom: 24px;
+}
+
+.profile-section-title {
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--warm-400);
+  margin-bottom: 12px;
+}
+
+.profile-bio-text {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--warm-600);
+  padding: 14px 16px;
+  background: var(--warm-100);
+  border-radius: var(--radius-md);
+}
+
+.profile-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.profile-tag {
+  padding: 8px 16px;
+  border-radius: var(--radius-full);
+  background: var(--honey-light);
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--warm-700);
+}
+
+.profile-pref-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--warm-100);
+}
+
+.profile-pref-item:last-child { border-bottom: none; }
+
+.profile-pref-label {
+  font-size: 0.92rem;
+  color: var(--warm-600);
+}
+
+.profile-pref-value {
+  font-size: 0.88rem;
+  font-weight: 500;
+  color: var(--warm-800);
+}
+
+.profile-edit-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--radius-full);
+  background: var(--honey);
+  color: var(--warm-800);
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 0.95rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: transform var(--transition-fast);
+}
+
+.profile-edit-btn:active { transform: scale(0.98); }
+
+/* ─── BOTTOM NAV ─── */
+.bottom-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 10px 0 22px;
+  background: var(--warm-50);
+  border-top: 1px solid var(--warm-100);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 5;
+}
+
+.nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  cursor: pointer;
+  padding: 4px 16px;
+  border-radius: var(--radius-md);
+  transition: color var(--transition-fast);
+  background: none;
+  border: none;
+  font-family: inherit;
+}
+
+.nav-item svg { width: 24px; height: 24px; color: var(--warm-300); transition: color var(--transition-fast); }
+
+.nav-item span {
+  font-size: 0.62rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  color: var(--warm-300);
+  transition: color var(--transition-fast);
+}
+
+.nav-item.active svg { color: var(--honey-dark); }
+.nav-item.active span { color: var(--honey-dark); }
+
+/* ─── EMPTY STATE ─── */
+.empty-state {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px;
+}
+
+.empty-state-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: var(--radius-full);
+  background: var(--honey-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.empty-state-icon svg { width: 32px; height: 32px; color: var(--honey-dark); }
+
+.empty-state-title {
+  font-family: 'Fraunces', serif;
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--warm-700);
+  margin-bottom: 8px;
+}
+
+.empty-state-desc {
+  font-size: 0.88rem;
+  color: var(--warm-400);
+  line-height: 1.5;
+}
+</style>
+</head>
+<body>
+
+<div class="app-shell">
+  <!-- ═══ SWIPE SCREEN ═══ -->
+  <div class="screen swipe-screen active" id="screen-swipe">
+    <div class="header">
+      <div class="header-title">bumble</div>
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="20" y2="12"/><line x1="4" y1="18" x2="16" y2="18"/></svg>
+      </div>
+    </div>
+    <div class="card-stack" id="cardStack"></div>
+    <div class="swipe-actions">
+      <button class="action-btn pass" onclick="triggerSwipe('left')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+      </button>
+      <button class="action-btn like-btn" onclick="triggerSwipe('right')">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      </button>
+      <button class="action-btn star">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ MATCHES SCREEN ═══ -->
+  <div class="screen" id="screen-matches">
+    <div class="header">
+      <div class="header-title">Matches</div>
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+    </div>
+    <div class="matches-row" id="matchesBubbles"></div>
+    <div class="section-label">Messages</div>
+    <div class="chat-list" id="chatList"></div>
+  </div>
+
+  <!-- ═══ CHAT SCREEN ═══ -->
+  <div class="screen chat-screen" id="screen-chat">
+    <div class="chat-header">
+      <button class="chat-back" onclick="closeChat()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <div class="chat-header-avatar" id="chatAvatar"></div>
+      <div>
+        <div class="chat-header-name" id="chatName"></div>
+        <div class="chat-header-status">Online now</div>
+      </div>
+    </div>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-bar">
+      <input class="chat-input" placeholder="Type a message..." id="chatInput" onkeydown="if(event.key==='Enter')sendMessage()">
+      <button class="chat-send" onclick="sendMessage()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ═══ PROFILE SCREEN ═══ -->
+  <div class="screen profile-screen" id="screen-profile">
+    <div class="header">
+      <div class="header-title">Profile</div>
+      <div class="header-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </div>
+    </div>
+    <div class="profile-hero">
+      <div class="profile-photo" style="background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=faces')">
+        <div class="profile-photo-edit">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+        </div>
+      </div>
+      <div class="profile-name">Jamie, 26</div>
+      <div class="profile-handle">Portland, OR</div>
+    </div>
+    <div class="profile-section">
+      <div class="profile-section-title">About me</div>
+      <div class="profile-bio-text">Design nerd who spends weekends at farmers markets, bookstores, and anywhere with good coffee. Looking for someone who can keep up with my terrible puns.</div>
+    </div>
+    <div class="profile-section">
+      <div class="profile-section-title">Interests</div>
+      <div class="profile-tags">
+        <span class="profile-tag">Design</span>
+        <span class="profile-tag">Coffee</span>
+        <span class="profile-tag">Hiking</span>
+        <span class="profile-tag">Vinyl Records</span>
+        <span class="profile-tag">Cooking</span>
+        <span class="profile-tag">Photography</span>
+      </div>
+    </div>
+    <div class="profile-section">
+      <div class="profile-section-title">Preferences</div>
+      <div class="profile-pref-item">
+        <span class="profile-pref-label">Age range</span>
+        <span class="profile-pref-value">24 – 32</span>
+      </div>
+      <div class="profile-pref-item">
+        <span class="profile-pref-label">Distance</span>
+        <span class="profile-pref-value">25 miles</span>
+      </div>
+      <div class="profile-pref-item">
+        <span class="profile-pref-label">Looking for</span>
+        <span class="profile-pref-value">Relationship</span>
+      </div>
+    </div>
+    <div class="profile-section">
+      <button class="profile-edit-btn">Edit Profile</button>
+    </div>
+  </div>
+
+  <!-- ═══ MATCH OVERLAY ═══ -->
+  <div class="match-overlay" id="matchOverlay">
+    <div class="match-content">
+      <div class="match-avatars">
+        <div class="match-avatar" style="background-image:url('https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200&h=200&fit=crop&crop=faces')"></div>
+        <div class="match-avatar" id="matchPartnerAvatar"></div>
+      </div>
+      <div class="match-title">It's a match!</div>
+      <div class="match-subtitle" id="matchSubtitle">You and Alex liked each other</div>
+      <div class="match-actions">
+        <button class="match-btn primary" onclick="sendMessageToMatch()">Send a message</button>
+        <button class="match-btn secondary" onclick="closeMatch()">Keep swiping</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ BOTTOM NAV ═══ -->
+  <div class="bottom-nav" id="bottomNav">
+    <button class="nav-item active" data-screen="swipe" onclick="switchScreen('swipe')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+      <span>Swipe</span>
+    </button>
+    <button class="nav-item" data-screen="matches" onclick="switchScreen('matches')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span>Matches</span>
+    </button>
+    <button class="nav-item" data-screen="profile" onclick="switchScreen('profile')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      <span>Profile</span>
+    </button>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+const profiles = [
+  {
+    name: 'Alex', age: 28,
+    photo: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=600&h=900&fit=crop&crop=faces',
+    bio: 'Architect by day, amateur chef by night. Will absolutely judge your bookshelf.',
+    tags: ['Architecture', 'Cooking', 'Reading', 'Jazz'],
+    matchChance: 0.4
+  },
+  {
+    name: 'Maya', age: 25,
+    photo: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=600&h=900&fit=crop&crop=faces',
+    bio: 'Plant mom with too many succulents. Let\'s grab tacos and talk about our favorite podcasts.',
+    tags: ['Plants', 'Podcasts', 'Yoga', 'Tacos'],
+    matchChance: 0.5
+  },
+  {
+    name: 'Jordan', age: 27,
+    photo: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=900&fit=crop&crop=faces',
+    bio: 'Software engineer who actually goes outside. Currently training for a half marathon.',
+    tags: ['Running', 'Tech', 'Board Games', 'Camping'],
+    matchChance: 0.3
+  },
+  {
+    name: 'Priya', age: 26,
+    photo: 'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=600&h=900&fit=crop&crop=faces',
+    bio: 'Documentary filmmaker with a weakness for bad horror movies and great wine.',
+    tags: ['Film', 'Wine', 'Travel', 'Art'],
+    matchChance: 0.6
+  },
+  {
+    name: 'Kai', age: 29,
+    photo: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=600&h=900&fit=crop&crop=faces',
+    bio: 'Surf instructor turned physical therapist. I\'ll teach you to ride waves if you teach me to cook.',
+    tags: ['Surfing', 'Fitness', 'Dogs', 'Sushi'],
+    matchChance: 0.4
+  },
+  {
+    name: 'Nora', age: 24,
+    photo: 'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=600&h=900&fit=crop&crop=faces',
+    bio: 'Grad student studying marine biology. My ideal date involves tide pools and fish tacos.',
+    tags: ['Science', 'Ocean', 'Hiking', 'Photography'],
+    matchChance: 0.5
+  }
+];
+
+const conversations = [
+  {
+    name: 'Sam',
+    photo: 'https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=200&h=200&fit=crop&crop=faces',
+    preview: 'Haha that\'s hilarious! So are we still on for...',
+    time: '2m',
+    unread: 2,
+    messages: [
+      { text: 'Hey! I saw you like hiking too 🏔️', sent: false, time: 'Yesterday' },
+      { text: 'Yes! I just did the Eagle Creek trail last weekend', sent: true },
+      { text: 'No way, that\'s one of my favorites!', sent: false },
+      { text: 'We should totally go together sometime', sent: true },
+      { text: 'Haha that\'s hilarious! So are we still on for Saturday?', sent: false, time: 'Today' },
+    ]
+  },
+  {
+    name: 'Olivia',
+    photo: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=200&h=200&fit=crop&crop=faces',
+    preview: 'I\'d love that! What time works for you?',
+    time: '1h',
+    unread: 0,
+    messages: [
+      { text: 'Your taste in music is amazing btw', sent: true, time: 'Yesterday' },
+      { text: 'Omg thank you! I\'m going to a show Friday actually', sent: false },
+      { text: 'Which one? I might know it', sent: true },
+      { text: 'The Marias at Crystal Ballroom!', sent: false },
+      { text: 'Want to grab coffee before the show?', sent: true },
+      { text: 'I\'d love that! What time works for you?', sent: false },
+    ]
+  },
+  {
+    name: 'Ethan',
+    photo: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=200&h=200&fit=crop&crop=faces',
+    preview: 'Sent you a photo',
+    time: '3h',
+    unread: 1,
+    messages: [
+      { text: 'Hey! Fellow coffee snob here ☕', sent: false, time: '2 days ago' },
+      { text: 'Haha guilty as charged. Pour-over or bust', sent: true },
+      { text: 'A person of culture! Have you tried Heart Coffee?', sent: false },
+      { text: 'Only my favorite spot in the city', sent: true },
+      { text: 'Sent you a photo', sent: false },
+    ]
+  }
+];
+
+const newMatches = [
+  { name: 'Riley', photo: 'https://images.unsplash.com/photo-1488426862026-3ee34a7d66df?w=200&h=200&fit=crop&crop=faces' },
+  { name: 'Morgan', photo: 'https://images.unsplash.com/photo-1463453091185-61582044d556?w=200&h=200&fit=crop&crop=faces' },
+  { name: 'Taylor', photo: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=200&h=200&fit=crop&crop=faces' },
+];
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let currentScreen = 'swipe';
+let cardIndex = 0;
+let isDragging = false;
+let startX = 0, startY = 0, currentX = 0;
+let activeCard = null;
+let matchedPerson = null;
+
+// ═══════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════
+function switchScreen(name) {
+  if (name === currentScreen) return;
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.querySelector(`.nav-item[data-screen="${name}"]`)?.classList.add('active');
+  currentScreen = name;
+
+  // Show/hide bottom nav in chat
+  document.getElementById('bottomNav').style.display = name === 'chat' ? 'none' : '';
+}
+
+// ═══════════════════════════════════════════
+// CARD STACK
+// ═══════════════════════════════════════════
+function renderCards() {
+  const stack = document.getElementById('cardStack');
+  stack.innerHTML = '';
+
+  const remaining = profiles.slice(cardIndex);
+  if (remaining.length === 0) {
+    stack.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-state-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </div>
+        <div class="empty-state-title">You've seen everyone</div>
+        <div class="empty-state-desc">Check back later for new people in your area</div>
+      </div>`;
+    return;
+  }
+
+  // Render up to 3 cards (back to front)
+  const visibleCards = remaining.slice(0, 3).reverse();
+  visibleCards.forEach((profile, i) => {
+    const realIndex = visibleCards.length - 1 - i;
+    const card = document.createElement('div');
+    card.className = 'profile-card';
+    card.style.transform = `scale(${1 - realIndex * 0.04}) translateY(${realIndex * 8}px)`;
+    card.style.zIndex = visibleCards.length - realIndex;
+
+    if (realIndex > 0) {
+      card.style.filter = `brightness(${1 - realIndex * 0.06})`;
+    }
+
+    card.innerHTML = `
+      <div class="card-photo" style="background-image:url('${profile.photo}')"></div>
+      <div class="card-gradient"></div>
+      <span class="swipe-label like">Like</span>
+      <span class="swipe-label nope">Nope</span>
+      <div class="card-info">
+        <div class="card-name">${profile.name}<span>${profile.age}</span></div>
+        <div class="card-bio">${profile.bio}</div>
+        <div class="card-tags">${profile.tags.map(t => `<span class="card-tag">${t}</span>`).join('')}</div>
+      </div>`;
+
+    if (realIndex === 0) {
+      card.addEventListener('pointerdown', onPointerDown);
+      activeCard = card;
+    }
+
+    stack.appendChild(card);
+  });
+}
+
+function onPointerDown(e) {
+  if (isDragging) return;
+  isDragging = true;
+  startX = e.clientX;
+  startY = e.clientY;
+  currentX = 0;
+  activeCard.style.transition = 'none';
+  activeCard.setPointerCapture(e.pointerId);
+  activeCard.addEventListener('pointermove', onPointerMove);
+  activeCard.addEventListener('pointerup', onPointerUp);
+}
+
+function onPointerMove(e) {
+  if (!isDragging) return;
+  currentX = e.clientX - startX;
+  const rotation = currentX * 0.08;
+  const opacity = Math.min(Math.abs(currentX) / 120, 1);
+
+  activeCard.style.transform = `translateX(${currentX}px) rotate(${rotation}deg)`;
+
+  const likeLabel = activeCard.querySelector('.swipe-label.like');
+  const nopeLabel = activeCard.querySelector('.swipe-label.nope');
+  likeLabel.style.opacity = currentX > 0 ? opacity : 0;
+  nopeLabel.style.opacity = currentX < 0 ? opacity : 0;
+}
+
+function onPointerUp(e) {
+  if (!isDragging) return;
+  isDragging = false;
+  activeCard.removeEventListener('pointermove', onPointerMove);
+  activeCard.removeEventListener('pointerup', onPointerUp);
+
+  const threshold = 100;
+  if (Math.abs(currentX) > threshold) {
+    completeSwipe(currentX > 0 ? 'right' : 'left');
+  } else {
+    activeCard.style.transition = 'transform 400ms cubic-bezier(0.16, 1, 0.3, 1)';
+    activeCard.style.transform = '';
+    activeCard.querySelector('.swipe-label.like').style.opacity = 0;
+    activeCard.querySelector('.swipe-label.nope').style.opacity = 0;
+  }
+}
+
+function completeSwipe(direction) {
+  const flyX = direction === 'right' ? window.innerWidth : -window.innerWidth;
+  const rotation = direction === 'right' ? 30 : -30;
+
+  activeCard.style.transition = 'transform 400ms cubic-bezier(0.4, 0, 1, 1)';
+  activeCard.style.transform = `translateX(${flyX}px) rotate(${rotation}deg)`;
+
+  const profile = profiles[cardIndex];
+
+  if (direction === 'right' && Math.random() < profile.matchChance) {
+    matchedPerson = profile;
+    setTimeout(() => showMatch(profile), 350);
+  }
+
+  cardIndex++;
+  setTimeout(renderCards, 380);
+}
+
+function triggerSwipe(direction) {
+  if (!activeCard || cardIndex >= profiles.length) return;
+
+  const likeLabel = activeCard.querySelector('.swipe-label.like');
+  const nopeLabel = activeCard.querySelector('.swipe-label.nope');
+
+  if (direction === 'right') {
+    likeLabel.style.opacity = 1;
+  } else {
+    nopeLabel.style.opacity = 1;
+  }
+
+  setTimeout(() => completeSwipe(direction), 150);
+}
+
+// ═══════════════════════════════════════════
+// MATCH
+// ═══════════════════════════════════════════
+function showMatch(profile) {
+  const overlay = document.getElementById('matchOverlay');
+  document.getElementById('matchPartnerAvatar').style.backgroundImage = `url('${profile.photo}')`;
+  document.getElementById('matchSubtitle').textContent = `You and ${profile.name} liked each other`;
+  overlay.classList.add('visible');
+}
+
+function closeMatch() {
+  document.getElementById('matchOverlay').classList.remove('visible');
+}
+
+function sendMessageToMatch() {
+  closeMatch();
+  if (matchedPerson) {
+    openChat({
+      name: matchedPerson.name,
+      photo: matchedPerson.photo,
+      messages: [{ text: `You matched with ${matchedPerson.name}! Say something clever.`, sent: false, time: 'Just now' }]
+    });
+  }
+}
+
+// ═══════════════════════════════════════════
+// MATCHES & CHAT LIST
+// ═══════════════════════════════════════════
+function renderMatchesList() {
+  const bubbles = document.getElementById('matchesBubbles');
+  bubbles.innerHTML = newMatches.map(m => `
+    <div class="match-bubble" onclick="openChat({name:'${m.name}',photo:'${m.photo}',messages:[{text:'You matched! Start the conversation.',sent:false,time:'Just now'}]})">
+      <div class="match-bubble-avatar" style="background-image:url('${m.photo}')"></div>
+      <div class="match-bubble-name">${m.name}</div>
+    </div>
+  `).join('');
+
+  const list = document.getElementById('chatList');
+  list.innerHTML = conversations.map((c, i) => `
+    <div class="chat-item" onclick="openChat(conversations[${i}])">
+      <div class="chat-item-avatar" style="background-image:url('${c.photo}')"></div>
+      <div class="chat-item-info">
+        <div class="chat-item-name">${c.name}</div>
+        <div class="chat-item-preview">${c.preview}</div>
+      </div>
+      <div class="chat-item-meta">
+        <div class="chat-item-time">${c.time}</div>
+        ${c.unread > 0 ? `<div class="chat-item-badge">${c.unread}</div>` : ''}
+      </div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════
+let currentChatData = null;
+
+function openChat(data) {
+  currentChatData = data;
+  document.getElementById('chatAvatar').style.backgroundImage = `url('${data.photo}')`;
+  document.getElementById('chatName').textContent = data.name;
+
+  renderMessages(data.messages);
+  switchScreen('chat');
+}
+
+function renderMessages(messages) {
+  const container = document.getElementById('chatMessages');
+  container.innerHTML = '';
+
+  messages.forEach((m, i) => {
+    if (m.time) {
+      const divider = document.createElement('div');
+      divider.className = 'msg-time-divider';
+      divider.textContent = m.time;
+      container.appendChild(divider);
+    }
+    const div = document.createElement('div');
+    div.className = `msg ${m.sent ? 'sent' : 'received'}`;
+    div.textContent = m.text;
+    div.style.animationDelay = `${i * 50}ms`;
+    container.appendChild(div);
+  });
+
+  // Typing indicator
+  const typing = document.createElement('div');
+  typing.className = 'typing-indicator';
+  typing.id = 'typingIndicator';
+  typing.style.display = 'none';
+  typing.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+  container.appendChild(typing);
+
+  setTimeout(() => container.scrollTop = container.scrollHeight, 100);
+}
+
+function sendMessage() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+
+  input.value = '';
+
+  const container = document.getElementById('chatMessages');
+  const msg = document.createElement('div');
+  msg.className = 'msg sent';
+  msg.textContent = text;
+  container.insertBefore(msg, document.getElementById('typingIndicator'));
+  container.scrollTop = container.scrollHeight;
+
+  // Show typing indicator, then reply
+  setTimeout(() => {
+    const typing = document.getElementById('typingIndicator');
+    typing.style.display = 'flex';
+    container.scrollTop = container.scrollHeight;
+
+    setTimeout(() => {
+      typing.style.display = 'none';
+      const replies = [
+        'Haha I love that!',
+        'That sounds amazing 😊',
+        'Tell me more!',
+        'You\'re so sweet!',
+        'I was just thinking the same thing',
+        'Absolutely, let\'s do it!',
+      ];
+      const reply = document.createElement('div');
+      reply.className = 'msg received';
+      reply.textContent = replies[Math.floor(Math.random() * replies.length)];
+      container.insertBefore(reply, typing);
+      container.scrollTop = container.scrollHeight;
+    }, 1500 + Math.random() * 1000);
+  }, 600);
+}
+
+function closeChat() {
+  switchScreen('matches');
+}
+
+// ═══════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════
+renderCards();
+renderMatchesList();
+</script>
+</body>
+</html>
