@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Bumble - Buzz Meetup</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700;800;900&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bumble-yellow: #FFC629;
+    --bumble-dark-yellow: #E8A600;
+    --bumble-black: #1A1A1A;
+    --bumble-dark: #2D2D2D;
+    --bumble-gray: #8C8C8C;
+    --bumble-light-gray: #E8E8E8;
+    --bumble-bg: #FAFAFA;
+    --bumble-white: #FFFFFF;
+    --bumble-red: #FF4458;
+    --bumble-green: #21D07A;
+    --bumble-pink: #FF6B81;
+    --bumble-gradient: linear-gradient(135deg, #FFC629 0%, #FF8A00 100%);
+    --bumble-premium-gradient: linear-gradient(135deg, #6C5CE7 0%, #A855F7 100%);
+  }
+
+  body {
+    font-family: 'Nunito Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #1A1A1A;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    overflow: hidden;
+  }
+
+  .phone-frame {
+    width: 390px;
+    height: 844px;
+    background: var(--bumble-bg);
+    border-radius: 44px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 0 0 10px #2D2D2D, 0 0 0 12px #4A4A4A, 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .status-bar {
+    height: 54px;
+    background: var(--bumble-white);
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    padding: 0 30px 8px;
+    font-size: 14px;
+    font-weight: 700;
+    position: relative;
+    z-index: 100;
+  }
+  .status-bar .time { font-size: 15px; font-weight: 700; }
+  .status-bar .icons { display: flex; gap: 5px; align-items: center; }
+  .status-bar .icons svg { width: 16px; height: 16px; }
+
+  .screen {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: none;
+    flex-direction: column;
+    opacity: 0;
+    transition: opacity 0.4s ease, transform 0.4s ease;
+    transform: translateX(30px);
+  }
+  .screen.active {
+    display: flex;
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  /* Home Screen - Bumble Main */
+  .screen-home .status-bar { background: var(--bumble-yellow); }
+  .home-header {
+    background: var(--bumble-yellow);
+    padding: 0 20px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .home-header .logo {
+    font-size: 28px;
+    font-weight: 900;
+    color: var(--bumble-black);
+    letter-spacing: -0.5px;
+  }
+  .home-header .header-icons { display: flex; gap: 16px; }
+  .home-header .header-icons svg { width: 26px; height: 26px; cursor: pointer; }
+
+  .home-tabs {
+    display: flex;
+    background: var(--bumble-white);
+    border-bottom: 2px solid var(--bumble-light-gray);
+  }
+  .home-tabs .tab {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 14px;
+    color: var(--bumble-gray);
+    cursor: pointer;
+    position: relative;
+  }
+  .home-tabs .tab.active {
+    color: var(--bumble-black);
+  }
+  .home-tabs .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 20%;
+    width: 60%;
+    height: 3px;
+    background: var(--bumble-black);
+    border-radius: 2px;
+  }
+
+  .home-card-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .profile-card-stack {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .profile-card-stack .card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #FFE0B2, #FFCC80);
+  }
+  .profile-card-stack .card-image-placeholder {
+    width: 100%;
+    height: 100%;
+    border-radius: 16px;
+    background: linear-gradient(180deg, #F5C842 0%, #E8A600 100%);
+    display: flex;
+    align-items: flex-end;
+    position: relative;
+  }
+  .card-avatar {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card-avatar-img {
+    width: 85%;
+    height: 90%;
+    border-radius: 16px;
+    object-fit: cover;
+  }
+  .card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 60px 20px 20px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.7));
+    color: white;
+    border-radius: 0 0 16px 16px;
+  }
+  .card-info h2 {
+    font-size: 26px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .card-info p {
+    font-size: 14px;
+    opacity: 0.9;
+  }
+  .card-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 12px 0;
+  }
+  .card-action-btn {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+  }
+  .card-action-btn:hover { transform: scale(1.08); }
+  .card-action-btn.pass { background: var(--bumble-white); }
+  .card-action-btn.like { background: var(--bumble-yellow); }
+  .card-action-btn svg { width: 24px; height: 24px; }
+
+  .bottom-nav {
+    display: flex;
+    background: var(--bumble-white);
+    border-top: 1px solid var(--bumble-light-gray);
+    padding: 8px 0 28px;
+  }
+  .bottom-nav .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    padding: 6px 0;
+  }
+  .bottom-nav .nav-item svg { width: 24px; height: 24px; }
+  .nav-item .nav-label {
+    font-size: 10px;
+    color: var(--bumble-gray);
+    font-weight: 600;
+  }
+  .nav-item.active .nav-label { color: var(--bumble-black); }
+
+  /* Alert Overlay */
+  .alert-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 200;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+  }
+  .alert-overlay.show {
+    display: flex;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .alert-card {
+    background: var(--bumble-white);
+    width: 85%;
+    border-radius: 24px;
+    padding: 36px 28px;
+    text-align: center;
+    animation: popIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+  }
+  .alert-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 6px;
+    background: var(--bumble-gradient);
+  }
+
+  .alert-icon {
+    width: 80px;
+    height: 80px;
+    background: var(--bumble-gradient);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 20px;
+    animation: pulse 2s infinite;
+  }
+  .alert-icon svg { width: 40px; height: 40px; fill: white; }
+
+  .alert-card h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--bumble-black);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .alert-card p {
+    font-size: 14px;
+    color: var(--bumble-gray);
+    line-height: 1.5;
+    margin-bottom: 24px;
+  }
+
+  .alert-avatars {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 24px;
+    position: relative;
+  }
+  .alert-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    border: 3px solid var(--bumble-white);
+    margin-left: -12px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    animation: slideInAvatar 0.3s ease forwards;
+    opacity: 0;
+  }
+  .alert-avatar:first-child { margin-left: 0; }
+
+  .btn-primary {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: var(--bumble-yellow);
+    color: var(--bumble-black);
+  }
+  .btn-primary:hover { background: var(--bumble-dark-yellow); transform: scale(1.02); }
+
+  .btn-secondary {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: var(--bumble-gray);
+    margin-top: 8px;
+  }
+
+  /* Profile Browsing Screen */
+  .screen-profiles .status-bar { background: var(--bumble-black); color: white; }
+  .profiles-header {
+    background: var(--bumble-black);
+    padding: 0 20px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .profiles-header h3 {
+    color: var(--bumble-yellow);
+    font-size: 18px;
+    font-weight: 800;
+  }
+  .profiles-progress {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+  .progress-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    transition: all 0.3s;
+  }
+  .progress-dot.active { background: var(--bumble-yellow); width: 24px; border-radius: 4px; }
+  .progress-dot.seen { background: rgba(255,198,41,0.5); }
+
+  .profile-view {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-slide {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: none;
+    flex-direction: column;
+    animation: slideIn 0.4s ease;
+  }
+  .profile-slide.active { display: flex; }
+
+  .profile-photo {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .profile-photo-bg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .profile-photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+  }
+  .profile-gradient {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 50%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+  }
+  .profile-details {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 20px;
+    color: white;
+  }
+  .profile-details .name-age {
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .profile-details .occupation {
+    font-size: 14px;
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+  .profile-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .profile-tag {
+    padding: 5px 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    font-size: 12px;
+    color: white;
+    backdrop-filter: blur(10px);
+  }
+  .profile-tag.match {
+    background: rgba(255, 198, 41, 0.3);
+    border: 1px solid rgba(255, 198, 41, 0.5);
+  }
+
+  .compatibility-bar {
+    padding: 12px 20px;
+    background: var(--bumble-black);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .compat-label {
+    font-size: 12px;
+    color: var(--bumble-yellow);
+    font-weight: 700;
+    white-space: nowrap;
+  }
+  .compat-fill-track {
+    flex: 1;
+    height: 6px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .compat-fill {
+    height: 100%;
+    background: var(--bumble-gradient);
+    border-radius: 3px;
+    transition: width 1s ease;
+  }
+  .compat-percent {
+    font-size: 14px;
+    font-weight: 800;
+    color: white;
+  }
+
+  .profile-action-bar {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 16px 0 40px;
+    background: var(--bumble-black);
+  }
+  .profile-action-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.2);
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .profile-action-btn:hover {
+    transform: scale(1.1);
+  }
+  .profile-action-btn.nope:hover { border-color: var(--bumble-red); background: rgba(255,68,88,0.15); }
+  .profile-action-btn.yep:hover { border-color: var(--bumble-green); background: rgba(33,208,122,0.15); }
+  .profile-action-btn svg { width: 28px; height: 28px; }
+
+  /* Confirmation Screen */
+  .screen-confirm {
+    background: var(--bumble-white);
+  }
+  .screen-confirm .status-bar { background: var(--bumble-white); }
+  .confirm-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    text-align: center;
+  }
+  .group-preview {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 32px;
+    position: relative;
+  }
+  .group-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    border: 3px solid var(--bumble-white);
+    margin-left: -16px;
+    background-size: cover;
+    background-position: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    position: relative;
+  }
+  .group-avatar:first-child { margin-left: 0; }
+  .group-avatar .check-badge {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 22px;
+    height: 22px;
+    background: var(--bumble-green);
+    border-radius: 50%;
+    border: 2px solid white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .group-avatar .check-badge svg { width: 12px; height: 12px; fill: white; }
+
+  .confirm-content h2 {
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--bumble-black);
+    margin-bottom: 12px;
+    line-height: 1.3;
+  }
+  .confirm-content p {
+    font-size: 15px;
+    color: var(--bumble-gray);
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+  .confirm-btns {
+    width: 100%;
+    max-width: 300px;
+  }
+  .btn-confirm-yes {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--bumble-yellow);
+    color: var(--bumble-black);
+    margin-bottom: 10px;
+    transition: all 0.2s;
+  }
+  .btn-confirm-yes:hover { background: var(--bumble-dark-yellow); }
+  .btn-confirm-no {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid var(--bumble-light-gray);
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: var(--bumble-gray);
+    transition: all 0.2s;
+  }
+  .btn-confirm-no:hover { border-color: var(--bumble-gray); }
+
+  /* Waiting/Matching Screen */
+  .screen-waiting {
+    background: var(--bumble-black);
+  }
+  .screen-waiting .status-bar { background: var(--bumble-black); color: white; }
+  .waiting-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    text-align: center;
+  }
+  .waiting-content h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 10px;
+  }
+  .waiting-content p {
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+    margin-bottom: 40px;
+  }
+
+  .match-circles {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    margin-bottom: 40px;
+    max-width: 280px;
+  }
+  .match-circle {
+    width: 80px;
+    text-align: center;
+  }
+  .match-circle-avatar {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+  }
+  .match-circle-ring {
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    border-radius: 50%;
+    border: 3px solid rgba(255,255,255,0.2);
+    transition: all 0.5s;
+  }
+  .match-circle.confirmed .match-circle-ring {
+    border-color: var(--bumble-green);
+    box-shadow: 0 0 16px rgba(33,208,122,0.4);
+  }
+  .match-circle.declined .match-circle-ring {
+    border-color: var(--bumble-red);
+    opacity: 0.5;
+  }
+  .match-circle.pending .match-circle-ring {
+    animation: pulseRing 1.5s infinite;
+  }
+  .match-circle-status {
+    position: absolute;
+    bottom: -2px;
+    right: -2px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid var(--bumble-black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .match-circle-status.yes { background: var(--bumble-green); }
+  .match-circle-status.no { background: var(--bumble-red); }
+  .match-circle-status.wait { background: var(--bumble-gray); }
+  .match-circle-status svg { width: 12px; height: 12px; fill: white; }
+  .match-circle-name {
+    font-size: 11px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 600;
+  }
+
+  .timer-display {
+    font-size: 48px;
+    font-weight: 900;
+    color: var(--bumble-yellow);
+    margin-bottom: 8px;
+    font-variant-numeric: tabular-nums;
+  }
+  .timer-label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+  }
+
+  /* Location Screen */
+  .screen-location {
+    background: var(--bumble-white);
+  }
+  .screen-location .status-bar { background: var(--bumble-yellow); }
+  .location-header {
+    background: var(--bumble-yellow);
+    padding: 0 20px 20px;
+    text-align: center;
+  }
+  .location-header h3 {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--bumble-black);
+    margin-bottom: 4px;
+  }
+  .location-header p {
+    font-size: 13px;
+    color: rgba(0,0,0,0.6);
+  }
+
+  .map-container {
+    height: 280px;
+    background: #E8E0D8;
+    position: relative;
+    overflow: hidden;
+  }
+  .map-placeholder {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  /* Stylized map */
+  .map-grid {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+  }
+  .map-street {
+    position: absolute;
+    background: #D4CCBF;
+  }
+  .map-street.h1 { top: 30%; left: 0; right: 0; height: 16px; }
+  .map-street.h2 { top: 60%; left: 0; right: 0; height: 12px; }
+  .map-street.h3 { top: 80%; left: 0; right: 0; height: 10px; }
+  .map-street.v1 { left: 25%; top: 0; bottom: 0; width: 14px; }
+  .map-street.v2 { left: 55%; top: 0; bottom: 0; width: 18px; }
+  .map-street.v3 { left: 78%; top: 0; bottom: 0; width: 10px; }
+  .map-block {
+    position: absolute;
+    background: #F0E8DC;
+    border-radius: 4px;
+  }
+  .map-block.b1 { top: 5%; left: 5%; width: 17%; height: 22%; }
+  .map-block.b2 { top: 5%; left: 28%; width: 24%; height: 22%; }
+  .map-block.b3 { top: 5%; left: 58%; width: 18%; height: 22%; }
+  .map-block.b4 { top: 5%; left: 81%; width: 14%; height: 22%; }
+  .map-block.b5 { top: 35%; left: 5%; width: 17%; height: 22%; }
+  .map-block.b6 { top: 35%; left: 28%; width: 24%; height: 22%; }
+  .map-block.b7 { top: 35%; left: 58%; width: 18%; height: 22%; }
+  .map-block.b8 { top: 65%; left: 5%; width: 17%; height: 12%; }
+  .map-block.b9 { top: 65%; left: 28%; width: 24%; height: 12%; }
+
+  .map-pin {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -100%);
+    z-index: 10;
+  }
+  .map-pin-icon {
+    width: 44px;
+    height: 56px;
+    position: relative;
+  }
+  .map-pin-head {
+    width: 44px;
+    height: 44px;
+    background: var(--bumble-yellow);
+    border-radius: 50% 50% 50% 0;
+    transform: rotate(-45deg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+  .map-pin-head svg {
+    width: 22px;
+    height: 22px;
+    transform: rotate(45deg);
+  }
+  .map-pin-shadow {
+    width: 20px;
+    height: 6px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 50%;
+    margin: 4px auto 0;
+  }
+  .map-pulse {
+    position: absolute;
+    top: 42%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: rgba(255,198,41,0.15);
+    animation: mapPulse 2s infinite;
+    z-index: 5;
+  }
+
+  .user-dot {
+    position: absolute;
+    bottom: 20%;
+    left: 30%;
+    width: 16px;
+    height: 16px;
+    background: #4A90D9;
+    border-radius: 50%;
+    border: 3px solid white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    z-index: 10;
+  }
+  .user-dot::after {
+    content: '';
+    position: absolute;
+    top: -8px; left: -8px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(74,144,217,0.2);
+    animation: mapPulse 2s infinite;
+  }
+
+  .location-card {
+    padding: 20px;
+    margin: -20px 16px 0;
+    background: var(--bumble-white);
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 20;
+  }
+  .location-card .venue-name {
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--bumble-black);
+    margin-bottom: 4px;
+  }
+  .location-card .venue-type {
+    font-size: 13px;
+    color: var(--bumble-gray);
+    margin-bottom: 12px;
+  }
+  .venue-stats {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .venue-stat {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    color: var(--bumble-dark);
+    font-weight: 600;
+  }
+  .venue-stat svg { width: 16px; height: 16px; }
+
+  .group-going {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #F7F7F7;
+    border-radius: 12px;
+    margin-bottom: 20px;
+  }
+  .group-going-avatars {
+    display: flex;
+    margin-right: 12px;
+  }
+  .group-going-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 2px solid white;
+    margin-left: -8px;
+    background-size: cover;
+    background-position: center;
+  }
+  .group-going-avatar:first-child { margin-left: 0; }
+  .group-going-text {
+    font-size: 13px;
+    color: var(--bumble-dark);
+  }
+  .group-going-text strong { font-weight: 800; }
+
+  .btn-go {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--bumble-yellow);
+    color: var(--bumble-black);
+    transition: all 0.2s;
+    margin-bottom: 8px;
+  }
+  .btn-go:hover { background: var(--bumble-dark-yellow); }
+  .btn-skip {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    border-radius: 50px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    background: transparent;
+    color: var(--bumble-gray);
+  }
+
+  /* Final Confirmation Screen */
+  .screen-going {
+    background: var(--bumble-black);
+  }
+  .screen-going .status-bar { background: var(--bumble-black); color: white; }
+  .going-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    text-align: center;
+  }
+  .going-checkmark {
+    width: 100px;
+    height: 100px;
+    background: var(--bumble-green);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .going-checkmark svg { width: 50px; height: 50px; fill: white; }
+  .going-content h2 {
+    font-size: 26px;
+    font-weight: 900;
+    color: white;
+    margin-bottom: 12px;
+  }
+  .going-content p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.5;
+    margin-bottom: 32px;
+  }
+  .going-venue-card {
+    width: 100%;
+    padding: 20px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 16px;
+    border: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 32px;
+  }
+  .going-venue-card h4 {
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 4px;
+  }
+  .going-venue-card .venue-addr {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 12px;
+  }
+  .eta-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(255,198,41,0.15);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bumble-yellow);
+  }
+  .eta-badge svg { width: 14px; height: 14px; fill: var(--bumble-yellow); }
+
+  .btn-open-maps {
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    background: var(--bumble-yellow);
+    color: var(--bumble-black);
+    transition: all 0.2s;
+  }
+
+  /* No Match / Premium Screen */
+  .screen-premium {
+    background: var(--bumble-white);
+  }
+  .screen-premium .status-bar { background: var(--bumble-white); }
+  .premium-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    text-align: center;
+  }
+  .sad-icon {
+    width: 80px;
+    height: 80px;
+    background: #F5F5F5;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    font-size: 40px;
+  }
+  .premium-content h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--bumble-black);
+    margin-bottom: 10px;
+    line-height: 1.3;
+  }
+  .premium-content > p {
+    font-size: 14px;
+    color: var(--bumble-gray);
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  .solo-matches {
+    width: 100%;
+    margin-bottom: 24px;
+  }
+  .solo-match-card {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    background: #F7F7F7;
+    border-radius: 14px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .solo-match-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    margin-right: 14px;
+    background-size: cover;
+    background-position: center;
+    flex-shrink: 0;
+  }
+  .solo-match-info {
+    flex: 1;
+    text-align: left;
+  }
+  .solo-match-info h4 {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--bumble-black);
+    margin-bottom: 2px;
+  }
+  .solo-match-info p {
+    font-size: 12px;
+    color: var(--bumble-gray);
+  }
+  .solo-match-heart {
+    color: var(--bumble-pink);
+    font-size: 20px;
+  }
+  .solo-match-blur {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(4px);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .blur-lock {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bumble-gray);
+  }
+  .blur-lock svg { width: 16px; height: 16px; }
+
+  .premium-card {
+    width: 100%;
+    padding: 20px;
+    background: linear-gradient(135deg, #6C5CE7, #A855F7);
+    border-radius: 16px;
+    margin-bottom: 16px;
+  }
+  .premium-card .premium-badge {
+    display: inline-flex;
+    padding: 4px 12px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+  }
+  .premium-card h3 {
+    font-size: 18px;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 6px;
+  }
+  .premium-card p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+    margin-bottom: 16px;
+  }
+  .btn-premium {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 50px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    background: white;
+    color: #6C5CE7;
+    transition: all 0.2s;
+  }
+  .btn-premium:hover { transform: scale(1.02); }
+
+  .btn-go-back {
+    padding: 12px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bumble-gray);
+    cursor: pointer;
+  }
+
+  /* Timeout Screen */
+  .screen-timeout {
+    background: var(--bumble-white);
+  }
+  .screen-timeout .status-bar { background: var(--bumble-white); }
+  .timeout-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px 28px;
+    text-align: center;
+  }
+  .timeout-icon {
+    width: 80px;
+    height: 80px;
+    background: #FFF3E0;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 24px;
+    font-size: 40px;
+  }
+  .timeout-content h2 {
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--bumble-black);
+    margin-bottom: 10px;
+  }
+  .timeout-content > p {
+    font-size: 14px;
+    color: var(--bumble-gray);
+    line-height: 1.5;
+    margin-bottom: 28px;
+  }
+
+  /* Animations */
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes popIn {
+    0% { transform: scale(0.5); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  @keyframes slideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes slideInAvatar {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+  }
+  @keyframes pulseRing {
+    0%, 100% { border-color: rgba(255,255,255,0.2); }
+    50% { border-color: rgba(255,198,41,0.6); }
+  }
+  @keyframes mapPulse {
+    0% { transform: translate(-50%, -50%) scale(0.8); opacity: 0.6; }
+    100% { transform: translate(-50%, -50%) scale(1.6); opacity: 0; }
+  }
+  @keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+
+  /* Restart button */
+  .restart-btn {
+    position: absolute;
+    top: 62px;
+    right: 16px;
+    z-index: 300;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(0,0,0,0.15);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .restart-btn:hover { background: rgba(0,0,0,0.25); transform: rotate(-30deg); }
+  .restart-btn svg { width: 18px; height: 18px; fill: white; }
+
+  /* Screen nav */
+  .screen-nav {
+    position: absolute;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 300;
+    display: flex;
+    gap: 6px;
+    padding: 6px 12px;
+    background: rgba(0,0,0,0.6);
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+  }
+  .screen-nav-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.3);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .screen-nav-dot.active { background: var(--bumble-yellow); width: 20px; border-radius: 4px; }
+  .screen-nav-dot:hover { background: rgba(255,255,255,0.6); }
+
+  /* Profile colors */
+  .profile-color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .profile-color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+  .profile-color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+  .profile-color-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+  .profile-color-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+  .avatar-color-1 { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+  .avatar-color-2 { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
+  .avatar-color-3 { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+  .avatar-color-4 { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+  .avatar-color-5 { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+
+  .avatar-letter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 900;
+    font-size: 24px;
+  }
+  .avatar-letter.sm { font-size: 16px; }
+  .avatar-letter.xs { font-size: 12px; }
+
+  @media (max-height: 700px) {
+    .phone-frame { height: 95vh; }
+  }
+  @media (max-width: 420px) {
+    .phone-frame { width: 100%; border-radius: 0; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="phone-frame" id="phone">
+  <!-- Restart Button -->
+  <button class="restart-btn" onclick="restart()" title="Restart prototype">
+    <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0012 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0112 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+  </button>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 1: HOME -->
+  <!-- ============================================ -->
+  <div class="screen screen-home active" id="screen-home">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="home-header">
+      <div class="logo">bumble</div>
+      <div class="header-icons">
+        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
+      </div>
+    </div>
+
+    <div class="home-tabs">
+      <div class="tab active">Date</div>
+      <div class="tab">BFF</div>
+      <div class="tab">Bizz</div>
+    </div>
+
+    <div class="home-card-area">
+      <div class="profile-card-stack">
+        <div class="profile-photo-placeholder profile-color-5">
+          <div class="card-avatar">
+            <div style="width:85%;height:90%;border-radius:16px;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,0.5) 100%),linear-gradient(135deg, #fa709a 0%, #fee140 100%);display:flex;align-items:flex-end;padding:20px;">
+              <div>
+                <div style="font-size:26px;font-weight:800;color:white;">Sarah, 27</div>
+                <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:4px;">UX Designer at Google</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-actions">
+      <button class="card-action-btn pass">
+        <svg viewBox="0 0 24 24"><path fill="#FF4458" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+      <button class="card-action-btn like">
+        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </button>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span class="nav-label">Date</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
+        <span class="nav-label">Chats</span>
+      </div>
+      <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+        <span class="nav-label">Profile</span>
+      </div>
+    </div>
+
+    <!-- Alert Overlay -->
+    <div class="alert-overlay" id="alert-overlay">
+      <div class="alert-card">
+        <div class="alert-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 010-5 2.5 2.5 0 010 5z"/></svg>
+        </div>
+        <div class="alert-avatars" id="alert-avatars"></div>
+        <h2>5 Matches Nearby!</h2>
+        <p>There are 5 potential matches within your radius right now. View their profiles and meet up as a group?</p>
+        <button class="btn-primary" onclick="goToProfiles()">View Matches</button>
+        <button class="btn-secondary" onclick="dismissAlert()">Not now</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 2: PROFILE BROWSING -->
+  <!-- ============================================ -->
+  <div class="screen screen-profiles" id="screen-profiles">
+    <div class="status-bar" style="background:var(--bumble-black);color:white;">
+      <span class="time" style="color:white;">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="white" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="white" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="profiles-header">
+      <svg width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer;" onclick="goToScreen('screen-home')"><path fill="white" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+      <h3>Buzz Meetup</h3>
+      <div class="profiles-progress" id="profiles-progress"></div>
+    </div>
+
+    <div class="profile-view" id="profile-view"></div>
+
+    <div id="compat-bar" class="compatibility-bar">
+      <span class="compat-label">Compatibility</span>
+      <div class="compat-fill-track"><div class="compat-fill" id="compat-fill" style="width:0%"></div></div>
+      <span class="compat-percent" id="compat-percent">0%</span>
+    </div>
+
+    <div class="profile-action-bar">
+      <button class="profile-action-btn nope" onclick="nextProfile()">
+        <svg viewBox="0 0 24 24"><path fill="#FF4458" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+      </button>
+      <button class="profile-action-btn" style="border-color:rgba(255,198,41,0.4);" onclick="nextProfile()">
+        <svg viewBox="0 0 24 24"><path fill="#FFC629" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+      </button>
+      <button class="profile-action-btn yep" onclick="nextProfile()">
+        <svg viewBox="0 0 24 24"><path fill="#21D07A" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 3: CONFIRM MEETUP -->
+  <!-- ============================================ -->
+  <div class="screen screen-confirm" id="screen-confirm">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="confirm-content">
+      <div class="group-preview" id="group-preview"></div>
+      <h2>Ready to meet this group?</h2>
+      <p>If the majority of the group also confirms, we'll find a perfect spot for everyone to meet up!</p>
+      <div class="confirm-btns">
+        <button class="btn-confirm-yes" onclick="confirmYes()">Yes, I'm in!</button>
+        <button class="btn-confirm-no" onclick="confirmNo()">Not this time</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 4: WAITING FOR OTHERS -->
+  <!-- ============================================ -->
+  <div class="screen screen-waiting" id="screen-waiting">
+    <div class="status-bar" style="background:var(--bumble-black);color:white;">
+      <span class="time" style="color:white;">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="white" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="white" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="waiting-content">
+      <h2>Waiting for the group...</h2>
+      <p>Hang tight! We're waiting for everyone to respond.</p>
+
+      <div class="match-circles" id="match-circles"></div>
+
+      <div class="timer-display" id="timer-display">2:00</div>
+      <div class="timer-label">Time remaining</div>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 5: MEETUP LOCATION -->
+  <!-- ============================================ -->
+  <div class="screen screen-location" id="screen-location">
+    <div class="status-bar" style="background:var(--bumble-yellow);">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="location-header">
+      <h3>It's a match!</h3>
+      <p>The group agreed! Here's your meetup spot.</p>
+    </div>
+
+    <div class="map-container">
+      <div class="map-placeholder">
+        <div class="map-grid">
+          <div class="map-block b1"></div>
+          <div class="map-block b2"></div>
+          <div class="map-block b3"></div>
+          <div class="map-block b4"></div>
+          <div class="map-block b5"></div>
+          <div class="map-block b6"></div>
+          <div class="map-block b7"></div>
+          <div class="map-block b8"></div>
+          <div class="map-block b9"></div>
+          <div class="map-street h1"></div>
+          <div class="map-street h2"></div>
+          <div class="map-street h3"></div>
+          <div class="map-street v1"></div>
+          <div class="map-street v2"></div>
+          <div class="map-street v3"></div>
+        </div>
+        <div class="map-pulse"></div>
+        <div class="map-pin">
+          <div class="map-pin-icon">
+            <div class="map-pin-head">
+              <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M18.36 9c.6-1.7.36-3.1.36-3.1s-1.4-.36-3.1.36a5.92 5.92 0 00-7.24 0C6.68 5.54 5.28 5.9 5.28 5.9S5.04 7.3 5.64 9A5.92 5.92 0 006 16.24c.6 1.7 1.76 3.06 1.76 3.06l2.12-2.12a2 2 0 012.24 0l2.12 2.12s1.16-1.36 1.76-3.06A5.92 5.92 0 0018.36 9zM12 13a2 2 0 110-4 2 2 0 010 4z"/></svg>
+            </div>
+          </div>
+          <div class="map-pin-shadow"></div>
+        </div>
+        <div class="user-dot"></div>
+      </div>
+    </div>
+
+    <div class="location-card">
+      <div class="venue-name">The Honey Pot Cafe</div>
+      <div class="venue-type">Coffee Shop & Wine Bar</div>
+      <div class="venue-stats">
+        <div class="venue-stat">
+          <svg viewBox="0 0 24 24"><path fill="#FFC629" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+          4.8
+        </div>
+        <div class="venue-stat">
+          <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+          0.3 mi away
+        </div>
+        <div class="venue-stat">
+          <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg>
+          ~5 min
+        </div>
+      </div>
+      <div class="group-going" id="group-going">
+        <div class="group-going-avatars" id="group-going-avatars"></div>
+        <div class="group-going-text"><strong>3 others</strong> are heading there now</div>
+      </div>
+      <button class="btn-go" onclick="confirmGoing()">I'm on my way!</button>
+      <button class="btn-skip" onclick="goToScreen('screen-home')">Maybe later</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 6: CONFIRMED GOING -->
+  <!-- ============================================ -->
+  <div class="screen screen-going" id="screen-going">
+    <div class="status-bar" style="background:var(--bumble-black);color:white;">
+      <span class="time" style="color:white;">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="white" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="white" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="going-content">
+      <div class="going-checkmark">
+        <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+      </div>
+      <h2>You're all set!</h2>
+      <p>Head to the meetup spot. Your group is on their way too!</p>
+      <div class="going-venue-card">
+        <h4>The Honey Pot Cafe</h4>
+        <div class="venue-addr">247 Walnut Street, Pittsburgh</div>
+        <div class="eta-badge">
+          <svg viewBox="0 0 24 24"><path d="M21 3L3 10.53v.98l6.84 2.65L12.48 21h.98L21 3z"/></svg>
+          5 min walk
+        </div>
+      </div>
+      <button class="btn-open-maps" onclick="goToScreen('screen-home')">Open in Maps</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 7: NO MATCH / PREMIUM -->
+  <!-- ============================================ -->
+  <div class="screen screen-premium" id="screen-premium">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="premium-content">
+      <div class="sad-icon">😔</div>
+      <h2>The group didn't match</h2>
+      <p>The majority didn't confirm this time. But some people liked you! Connect with them individually.</p>
+
+      <div class="solo-matches">
+        <div class="solo-match-card">
+          <div class="solo-match-avatar avatar-color-1 avatar-letter sm">M</div>
+          <div class="solo-match-info">
+            <h4>Maya, 25</h4>
+            <p>Liked you during the session</p>
+          </div>
+          <span class="solo-match-heart">&#9829;</span>
+        </div>
+        <div class="solo-match-card">
+          <div class="solo-match-avatar avatar-color-3 avatar-letter sm">J</div>
+          <div class="solo-match-info">
+            <h4>Jordan, 28</h4>
+            <p>Liked you during the session</p>
+          </div>
+          <span class="solo-match-heart">&#9829;</span>
+          <div class="solo-match-blur">
+            <div class="blur-lock">
+              <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              Premium Only
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <div class="premium-badge">Bumble Premium</div>
+        <h3>Unlock Solo Connections</h3>
+        <p>See and connect with everyone who liked you during Buzz Meetups.</p>
+        <button class="btn-premium">Upgrade Now</button>
+      </div>
+
+      <button class="btn-go-back" onclick="goToScreen('screen-home')">Back to swiping</button>
+    </div>
+  </div>
+
+  <!-- ============================================ -->
+  <!-- SCREEN 8: TIMEOUT -->
+  <!-- ============================================ -->
+  <div class="screen screen-timeout" id="screen-timeout">
+    <div class="status-bar">
+      <span class="time">9:41</span>
+      <span class="icons">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      </span>
+    </div>
+
+    <div class="timeout-content">
+      <div class="timeout-icon">&#9203;</div>
+      <h2>Time's up!</h2>
+      <p>The group didn't respond in time. But don't worry — some people showed interest in you!</p>
+
+      <div class="solo-matches" style="margin-bottom:24px;">
+        <div class="solo-match-card">
+          <div class="solo-match-avatar avatar-color-2 avatar-letter sm">L</div>
+          <div class="solo-match-info">
+            <h4>Liam, 26</h4>
+            <p>Showed interest in you</p>
+          </div>
+          <span class="solo-match-heart">&#9829;</span>
+          <div class="solo-match-blur">
+            <div class="blur-lock">
+              <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              Premium to View
+            </div>
+          </div>
+        </div>
+        <div class="solo-match-card">
+          <div class="solo-match-avatar avatar-color-4 avatar-letter sm">A</div>
+          <div class="solo-match-info">
+            <h4>Ava, 24</h4>
+            <p>Showed interest in you</p>
+          </div>
+          <span class="solo-match-heart">&#9829;</span>
+          <div class="solo-match-blur">
+            <div class="blur-lock">
+              <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3.1-9H8.9V6c0-1.71 1.39-3.1 3.1-3.1 1.71 0 3.1 1.39 3.1 3.1v2z"/></svg>
+              Premium to View
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-card">
+        <div class="premium-badge">Bumble Premium</div>
+        <h3>See Who Liked You</h3>
+        <p>Unlock profiles of people who showed interest during timed Buzz sessions.</p>
+        <button class="btn-premium">Upgrade Now</button>
+      </div>
+
+      <button class="btn-go-back" onclick="goToScreen('screen-home')">Back to swiping</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ===== DATA =====
+  const profiles = [
+    { name: "Maya", age: 25, job: "Graphic Designer", compat: 87, color: 1, tags: ["Art Lover", "Coffee Addict", "Hiking"], matchTag: "Music" },
+    { name: "Jordan", age: 28, job: "Software Engineer", compat: 92, color: 2, tags: ["Foodie", "Rock Climbing", "Travel"], matchTag: "Dogs" },
+    { name: "Liam", age: 26, job: "Marketing Manager", compat: 78, color: 3, tags: ["Photography", "Running", "Cooking"], matchTag: "Fitness" },
+    { name: "Ava", age: 24, job: "Nurse Practitioner", compat: 85, color: 4, tags: ["Yoga", "Reading", "Wine"], matchTag: "Wellness" },
+    { name: "Ethan", age: 29, job: "Architect", compat: 81, color: 5, tags: ["Design", "Cycling", "Jazz"], matchTag: "Creativity" }
+  ];
+
+  let currentProfile = 0;
+  let timerInterval = null;
+  let waitingTimeout = null;
+
+  // ===== INIT =====
+  function init() {
+    buildAlertAvatars();
+    buildProfiles();
+    buildGroupPreview();
+    buildMatchCircles();
+    buildGroupGoing();
+
+    // Auto-trigger alert after 2 seconds on home
+    setTimeout(() => {
+      document.getElementById('alert-overlay').classList.add('show');
+    }, 1500);
+  }
+
+  function buildAlertAvatars() {
+    const container = document.getElementById('alert-avatars');
+    container.innerHTML = '';
+    profiles.forEach((p, i) => {
+      const av = document.createElement('div');
+      av.className = `alert-avatar avatar-color-${p.color} avatar-letter`;
+      av.textContent = p.name[0];
+      av.style.animationDelay = `${i * 0.1}s`;
+      container.appendChild(av);
+    });
+  }
+
+  function buildProfiles() {
+    const view = document.getElementById('profile-view');
+    const progress = document.getElementById('profiles-progress');
+    view.innerHTML = '';
+    progress.innerHTML = '';
+
+    profiles.forEach((p, i) => {
+      // Profile slide
+      const slide = document.createElement('div');
+      slide.className = `profile-slide ${i === 0 ? 'active' : ''}`;
+      slide.id = `profile-${i}`;
+      slide.innerHTML = `
+        <div class="profile-photo">
+          <div class="profile-photo-placeholder profile-color-${p.color}" style="display:flex;align-items:center;justify-content:center;">
+            <span style="font-size:140px;color:rgba(255,255,255,0.3);font-weight:900;">${p.name[0]}</span>
+          </div>
+          <div class="profile-gradient"></div>
+          <div class="profile-details">
+            <div class="name-age">${p.name}, ${p.age}</div>
+            <div class="occupation">${p.job}</div>
+            <div class="profile-tags">
+              ${p.tags.map(t => `<span class="profile-tag">${t}</span>`).join('')}
+              <span class="profile-tag match">${p.matchTag}</span>
+            </div>
+          </div>
+        </div>
+      `;
+      view.appendChild(slide);
+
+      // Progress dot
+      const dot = document.createElement('div');
+      dot.className = `progress-dot ${i === 0 ? 'active' : ''}`;
+      dot.id = `progress-dot-${i}`;
+      progress.appendChild(dot);
+    });
+
+    updateCompat(0);
+  }
+
+  function updateCompat(idx) {
+    const p = profiles[idx];
+    const fill = document.getElementById('compat-fill');
+    const pct = document.getElementById('compat-percent');
+    setTimeout(() => {
+      fill.style.width = p.compat + '%';
+      pct.textContent = p.compat + '%';
+    }, 200);
+  }
+
+  function buildGroupPreview() {
+    const container = document.getElementById('group-preview');
+    container.innerHTML = '';
+    profiles.forEach((p) => {
+      const av = document.createElement('div');
+      av.className = `group-avatar avatar-color-${p.color} avatar-letter`;
+      av.textContent = p.name[0];
+      container.appendChild(av);
+    });
+  }
+
+  function buildMatchCircles() {
+    const container = document.getElementById('match-circles');
+    container.innerHTML = '';
+    profiles.forEach((p) => {
+      const circle = document.createElement('div');
+      circle.className = 'match-circle pending';
+      circle.id = `match-circle-${p.name}`;
+      circle.innerHTML = `
+        <div class="match-circle-avatar avatar-color-${p.color} avatar-letter" style="font-size:22px;">
+          ${p.name[0]}
+          <div class="match-circle-ring"></div>
+          <div class="match-circle-status wait">
+            <svg viewBox="0 0 24 24"><path d="M12 6v6l4 2" stroke="white" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+        <div class="match-circle-name">${p.name}</div>
+      `;
+      container.appendChild(circle);
+    });
+  }
+
+  function buildGroupGoing() {
+    const container = document.getElementById('group-going-avatars');
+    container.innerHTML = '';
+    profiles.slice(0, 3).forEach((p) => {
+      const av = document.createElement('div');
+      av.className = `group-going-avatar avatar-color-${p.color} avatar-letter xs`;
+      av.textContent = p.name[0];
+      container.appendChild(av);
+    });
+  }
+
+  // ===== NAVIGATION =====
+  function goToScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+    });
+    const target = document.getElementById(screenId);
+    if (target) {
+      target.classList.add('active');
+      target.style.display = 'flex';
+      target.style.opacity = '0';
+      target.style.transform = 'translateX(30px)';
+      requestAnimationFrame(() => {
+        target.style.opacity = '1';
+        target.style.transform = 'translateX(0)';
+      });
+    }
+  }
+
+  function dismissAlert() {
+    document.getElementById('alert-overlay').classList.remove('show');
+  }
+
+  function goToProfiles() {
+    dismissAlert();
+    currentProfile = 0;
+    goToScreen('screen-profiles');
+    buildProfiles();
+  }
+
+  function nextProfile() {
+    const prev = document.getElementById(`profile-${currentProfile}`);
+    const prevDot = document.getElementById(`progress-dot-${currentProfile}`);
+
+    if (prev) prev.classList.remove('active');
+    if (prevDot) {
+      prevDot.classList.remove('active');
+      prevDot.classList.add('seen');
+    }
+
+    currentProfile++;
+
+    if (currentProfile >= profiles.length) {
+      goToScreen('screen-confirm');
+      return;
+    }
+
+    const next = document.getElementById(`profile-${currentProfile}`);
+    const nextDot = document.getElementById(`progress-dot-${currentProfile}`);
+
+    if (next) {
+      next.classList.add('active');
+      next.style.animation = 'none';
+      requestAnimationFrame(() => { next.style.animation = ''; });
+    }
+    if (nextDot) nextDot.classList.add('active');
+
+    updateCompat(currentProfile);
+  }
+
+  function confirmYes() {
+    goToScreen('screen-waiting');
+    startWaitingSimulation('match');
+  }
+
+  function confirmNo() {
+    goToScreen('screen-premium');
+  }
+
+  // ===== WAITING SIMULATION =====
+  function startWaitingSimulation(outcome) {
+    let seconds = 15; // shorter for demo
+    const display = document.getElementById('timer-display');
+
+    // Reset circles
+    buildMatchCircles();
+
+    // Update timer
+    if (timerInterval) clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+      seconds--;
+      const m = Math.floor(seconds / 60);
+      const s = seconds % 60;
+      display.textContent = `${m}:${s.toString().padStart(2, '0')}`;
+
+      if (seconds <= 0) {
+        clearInterval(timerInterval);
+      }
+    }, 1000);
+
+    // Simulate responses rolling in
+    const responses = outcome === 'match'
+      ? [
+          { name: 'Maya', delay: 2000, status: 'confirmed' },
+          { name: 'Jordan', delay: 4000, status: 'confirmed' },
+          { name: 'Liam', delay: 6500, status: 'declined' },
+          { name: 'Ava', delay: 8000, status: 'confirmed' },
+          { name: 'Ethan', delay: 10000, status: 'confirmed' },
+        ]
+      : [
+          { name: 'Maya', delay: 2000, status: 'confirmed' },
+          { name: 'Jordan', delay: 4000, status: 'declined' },
+          { name: 'Liam', delay: 6500, status: 'declined' },
+          { name: 'Ava', delay: 8000, status: 'declined' },
+          { name: 'Ethan', delay: 10000, status: 'confirmed' },
+        ];
+
+    responses.forEach(r => {
+      waitingTimeout = setTimeout(() => {
+        updateMatchCircle(r.name, r.status);
+      }, r.delay);
+    });
+
+    // Navigate after all responses
+    setTimeout(() => {
+      clearInterval(timerInterval);
+      if (outcome === 'match') {
+        goToScreen('screen-location');
+      } else {
+        goToScreen('screen-premium');
+      }
+    }, 12000);
+  }
+
+  function updateMatchCircle(name, status) {
+    const circle = document.getElementById(`match-circle-${name}`);
+    if (!circle) return;
+
+    circle.classList.remove('pending');
+    circle.classList.add(status);
+
+    const statusEl = circle.querySelector('.match-circle-status');
+    if (status === 'confirmed') {
+      statusEl.className = 'match-circle-status yes';
+      statusEl.innerHTML = '<svg viewBox="0 0 24 24"><path fill="white" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>';
+    } else {
+      statusEl.className = 'match-circle-status no';
+      statusEl.innerHTML = '<svg viewBox="0 0 24 24"><path fill="white" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>';
+    }
+  }
+
+  function confirmGoing() {
+    goToScreen('screen-going');
+  }
+
+  // ===== RESTART =====
+  function restart() {
+    clearInterval(timerInterval);
+    currentProfile = 0;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById('screen-home').classList.add('active');
+    document.getElementById('alert-overlay').classList.remove('show');
+
+    setTimeout(() => {
+      document.getElementById('alert-overlay').classList.add('show');
+    }, 1500);
+  }
+
+  // ===== DEMO PATH BUTTONS (injected at bottom) =====
+  // Allow testing the "no match" and "timeout" paths
+  const demoNav = document.createElement('div');
+  demoNav.style.cssText = 'position:absolute;bottom:8px;left:50%;transform:translateX(-50%);z-index:400;display:flex;gap:4px;';
+  demoNav.innerHTML = `
+    <button onclick="restart()" style="padding:4px 10px;border:none;border-radius:12px;background:rgba(255,198,41,0.9);color:#1A1A1A;font-size:10px;font-weight:700;cursor:pointer;">Happy Path</button>
+    <button onclick="demoDeny()" style="padding:4px 10px;border:none;border-radius:12px;background:rgba(255,68,88,0.9);color:white;font-size:10px;font-weight:700;cursor:pointer;">No Match</button>
+    <button onclick="demoTimeout()" style="padding:4px 10px;border:none;border-radius:12px;background:rgba(140,140,140,0.9);color:white;font-size:10px;font-weight:700;cursor:pointer;">Timeout</button>
+  `;
+  document.getElementById('phone').appendChild(demoNav);
+
+  function demoDeny() {
+    clearInterval(timerInterval);
+    goToScreen('screen-waiting');
+    startWaitingSimulation('deny');
+  }
+
+  function demoTimeout() {
+    clearInterval(timerInterval);
+    goToScreen('screen-timeout');
+  }
+
+  // Init
+  init();
+</script>
+
+</body>
+</html>
