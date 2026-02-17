@@ -8,4 +8,4 @@ Project Definition:
 [Design Brief](https://docs.google.com/document/u/0/d/1s4eyEjxA0gXHs8XpPSVwwt-XBh4MuxlG3uNH4U9HTEg/edit)
 
 Version Control Strategy:
-I plan on using GitHub for tracking change revisions. If something goes wrong, I will use the history of changes to revert back to a version that I know worked and continue making changes as needed.
+Github is being used for tracking changes and revisions. A public repository under the name of "BumbleAIxD" has been created and all current changes to the existing prototype have been continuously committed and pushed. 
