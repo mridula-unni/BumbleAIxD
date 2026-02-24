@@ -9,3 +9,6 @@ Project Definition:
 
 Version Control Strategy:
 Github is being used for tracking changes and revisions. A public repository under the name of "BumbleAIxD" has been created and all current changes to the existing prototype have been continuously committed and pushed. 
+
+2/24/26 Updates:
+MCP tools with the claude and figma developer tool were unsuccessful due to incompatible language frameworks. I will continue trying to troubleshoot this issue since the components within the prototype are still not as identical as I had hoped. When using claude code without the developer tool in Figma, it is critical to make small changes that can be saved quickly with smaller token amounts. Large changes will likely result in incomplete prototyping sessions (like what happened today).
