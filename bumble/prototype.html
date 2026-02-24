@@ -79,166 +79,239 @@
     transform: translateX(0);
   }
 
-  /* Home Screen - Bumble Main */
-  .screen-home .status-bar { background: var(--bumble-yellow); }
-  .home-header {
-    background: var(--bumble-yellow);
-    padding: 0 20px 16px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .home-header .logo {
-    font-size: 28px;
-    font-weight: 900;
-    color: var(--bumble-black);
-    letter-spacing: -0.5px;
-  }
-  .home-header .header-icons { display: flex; gap: 16px; }
-  .home-header .header-icons svg { width: 26px; height: 26px; cursor: pointer; }
+  /* ─── Home Screen - People Feed ─── */
+  .screen-home { background: var(--bumble-white); }
+  .screen-home .status-bar { background: var(--bumble-white); color: var(--bumble-black); }
 
-  .home-tabs {
+  /* Top Tab Bar */
+  .top-tab-bar {
     display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 16px 12px;
     background: var(--bumble-white);
-    border-bottom: 2px solid var(--bumble-light-gray);
+    flex-shrink: 0;
   }
-  .home-tabs .tab {
-    flex: 1;
-    padding: 14px;
-    text-align: center;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--bumble-gray);
+  .top-tab-pill {
+    padding: 10px 22px;
+    border-radius: 50px;
+    font-size: 16px;
+    font-weight: 900;
+    border: none;
     cursor: pointer;
-    position: relative;
+    transition: all 0.2s;
+    letter-spacing: -0.3px;
   }
-  .home-tabs .tab.active {
+  .top-tab-pill.active {
+    background: var(--bumble-yellow);
     color: var(--bumble-black);
   }
-  .home-tabs .tab.active::after {
-    content: '';
-    position: absolute;
-    bottom: -2px;
-    left: 20%;
-    width: 60%;
-    height: 3px;
-    background: var(--bumble-black);
-    border-radius: 2px;
+  .top-tab-pill.inactive {
+    background: var(--bumble-light-gray);
+    color: var(--bumble-gray);
   }
-
-  .home-card-area {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 16px;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .profile-card-stack {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    border-radius: 16px;
-    overflow: hidden;
-  }
-  .profile-card-stack .card-image {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #FFE0B2, #FFCC80);
-  }
-  .profile-card-stack .card-image-placeholder {
-    width: 100%;
-    height: 100%;
-    border-radius: 16px;
-    background: linear-gradient(180deg, #F5C842 0%, #E8A600 100%);
-    display: flex;
-    align-items: flex-end;
-    position: relative;
-  }
-  .card-avatar {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .card-avatar-img {
-    width: 85%;
-    height: 90%;
-    border-radius: 16px;
-    object-fit: cover;
-  }
-  .card-info {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    padding: 60px 20px 20px;
-    background: linear-gradient(transparent, rgba(0,0,0,0.7));
-    color: white;
-    border-radius: 0 0 16px 16px;
-  }
-  .card-info h2 {
-    font-size: 26px;
-    font-weight: 800;
-    margin-bottom: 4px;
-  }
-  .card-info p {
-    font-size: 14px;
-    opacity: 0.9;
-  }
-  .card-actions {
-    display: flex;
-    justify-content: center;
-    gap: 16px;
-    padding: 12px 0;
-  }
-  .card-action-btn {
-    width: 56px;
-    height: 56px;
+  .top-tab-icon {
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     border: none;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+  }
+  .top-tab-icon:hover { transform: scale(1.08); }
+  .top-tab-icon.wave-icon {
+    background: var(--bumble-yellow);
+  }
+  .top-tab-icon.filter-icon {
+    background: var(--bumble-black);
+  }
+  .top-tab-icon.search-icon {
+    background: none;
+    width: 36px;
+    height: 36px;
+    margin-left: auto;
+  }
+  .top-tab-icon svg { width: 20px; height: 20px; }
+
+  /* People Feed */
+  .people-feed {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0 12px 8px;
+  }
+  .people-feed::-webkit-scrollbar { display: none; }
+
+  .feed-card {
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    position: relative;
+    cursor: pointer;
     transition: transform 0.2s;
   }
-  .card-action-btn:hover { transform: scale(1.08); }
-  .card-action-btn.pass { background: var(--bumble-white); }
-  .card-action-btn.like { background: var(--bumble-yellow); }
-  .card-action-btn svg { width: 24px; height: 24px; }
+  .feed-card:active { transform: scale(0.985); }
+  .feed-card-photo {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    display: block;
+    background-size: cover;
+    background-position: center;
+  }
+  .feed-card-photo-placeholder {
+    width: 100%;
+    aspect-ratio: 3 / 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 100px;
+    color: rgba(255,255,255,0.3);
+    font-weight: 900;
+  }
+  .feed-card-overlay {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+  .feed-card-top-gradient {
+    height: 35%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+    border-radius: 20px 20px 0 0;
+  }
+  .feed-card-bottom-gradient {
+    height: 45%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    border-radius: 0 0 20px 20px;
+  }
+  .feed-card-info-top {
+    position: absolute;
+    top: 16px;
+    left: 18px;
+    z-index: 2;
+  }
+  .feed-card-name {
+    font-size: 28px;
+    font-weight: 900;
+    color: white;
+    letter-spacing: -0.5px;
+    line-height: 1.1;
+  }
+  .feed-card-location {
+    font-size: 13px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.85);
+    margin-top: 2px;
+  }
+  .feed-card-info-bottom {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px 18px;
+    z-index: 2;
+  }
+  .feed-card-bio {
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+    line-height: 1.4;
+    margin-bottom: 12px;
+    max-width: 70%;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .feed-card-wave {
+    position: absolute;
+    bottom: 50px;
+    right: 18px;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--bumble-yellow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+    z-index: 3;
+  }
+  .feed-card-wave:hover { transform: scale(1.1); }
+  .feed-card-wave svg { width: 24px; height: 24px; }
+  .feed-card-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    pointer-events: auto;
+  }
+  .feed-card-tags::-webkit-scrollbar { display: none; }
+  .feed-card-tag {
+    padding: 6px 14px;
+    background: var(--bumble-white);
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--bumble-black);
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
 
-  .bottom-nav {
+  /* ─── Bottom Nav (5 tabs) ─── */
+  .bottom-nav-5 {
     display: flex;
     background: var(--bumble-white);
     border-top: 1px solid var(--bumble-light-gray);
-    padding: 8px 0 28px;
+    padding: 8px 0 4px;
+    flex-shrink: 0;
   }
-  .bottom-nav .nav-item {
+  .bottom-nav-5 .bnav-item {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 3px;
     cursor: pointer;
-    padding: 6px 0;
+    padding: 4px 0;
+    background: none;
+    border: none;
+    font-family: inherit;
   }
-  .bottom-nav .nav-item svg { width: 24px; height: 24px; }
-  .nav-item .nav-label {
+  .bottom-nav-5 .bnav-item svg { width: 24px; height: 24px; color: var(--bumble-gray); }
+  .bottom-nav-5 .bnav-item .bnav-label {
     font-size: 10px;
     color: var(--bumble-gray);
     font-weight: 600;
   }
-  .nav-item.active .nav-label { color: var(--bumble-black); }
+  .bottom-nav-5 .bnav-item.active svg { color: var(--bumble-black); }
+  .bottom-nav-5 .bnav-item.active .bnav-label { color: var(--bumble-black); }
+
+  /* Home indicator for light screens */
+  .home-indicator-light {
+    width: 100%;
+    padding: 6px 0 8px;
+    display: flex;
+    justify-content: center;
+    background: var(--bumble-white);
+  }
+  .home-indicator-light .home-indicator-bar {
+    width: 134px;
+    height: 5px;
+    background: var(--bumble-black);
+    border-radius: 3px;
+    opacity: 0.2;
+  }
 
   /* Alert Overlay */
   .alert-overlay {
@@ -349,42 +422,39 @@
   }
 
   /* Profile Browsing Screen */
+  .screen-profiles { background: var(--bumble-black); }
   .screen-profiles .status-bar { background: var(--bumble-black); color: white; }
   .profiles-header {
     background: var(--bumble-black);
     padding: 0 20px 16px;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-  }
-  .profiles-header h3 {
-    color: var(--bumble-yellow);
-    font-size: 18px;
-    font-weight: 800;
+    justify-content: center;
   }
   .profiles-progress {
     display: flex;
-    gap: 6px;
+    gap: 10px;
     align-items: center;
   }
   .progress-dot {
-    width: 8px;
-    height: 8px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
-    background: rgba(255,255,255,0.3);
+    background: rgba(255,255,255,0.5);
     transition: all 0.3s;
   }
-  .progress-dot.active { background: var(--bumble-yellow); width: 24px; border-radius: 4px; }
-  .progress-dot.seen { background: rgba(255,198,41,0.5); }
+  .progress-dot.active { background: var(--bumble-yellow); }
+  .progress-dot.seen { background: rgba(255,255,255,0.5); }
 
   .profile-view {
     flex: 1;
     position: relative;
     overflow: hidden;
+    padding: 0 20px;
   }
   .profile-slide {
     position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
+    top: 0; left: 20px; right: 20px; bottom: 0;
     display: none;
     flex-direction: column;
     animation: slideIn 0.4s ease;
@@ -395,6 +465,7 @@
     flex: 1;
     position: relative;
     overflow: hidden;
+    border-radius: 20px;
   }
   .profile-photo-bg {
     width: 100%;
@@ -411,89 +482,87 @@
   }
   .profile-gradient {
     position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.55), transparent);
+    border-radius: 20px 20px 0 0;
+  }
+  .profile-gradient-bottom {
+    position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 50%;
-    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    height: 45%;
+    background: linear-gradient(transparent, rgba(0,0,0,0.6));
+    border-radius: 0 0 20px 20px;
   }
   .profile-details {
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    padding: 20px;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 24px;
     color: white;
   }
+  .profile-details .profile-top-info {
+    z-index: 2;
+  }
   .profile-details .name-age {
-    font-size: 28px;
-    font-weight: 800;
-    margin-bottom: 4px;
+    font-size: 32px;
+    font-weight: 900;
+    margin-bottom: 2px;
+    letter-spacing: -0.5px;
   }
   .profile-details .occupation {
-    font-size: 14px;
-    opacity: 0.85;
-    margin-bottom: 8px;
+    font-size: 15px;
+    opacity: 0.9;
+    font-weight: 600;
+  }
+  .profile-details .profile-bottom-info {
+    z-index: 2;
+  }
+  .profile-details .bio-text {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.4;
+    margin-bottom: 14px;
+    color: white;
   }
   .profile-tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 8px;
   }
   .profile-tag {
-    padding: 5px 12px;
-    background: rgba(255,255,255,0.2);
-    border-radius: 20px;
-    font-size: 12px;
-    color: white;
-    backdrop-filter: blur(10px);
+    padding: 8px 18px;
+    background: var(--bumble-white);
+    border-radius: 24px;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--bumble-black);
   }
   .profile-tag.match {
-    background: rgba(255, 198, 41, 0.3);
-    border: 1px solid rgba(255, 198, 41, 0.5);
+    background: var(--bumble-white);
+    border: none;
+    color: var(--bumble-black);
   }
 
   .compatibility-bar {
-    padding: 12px 20px;
-    background: var(--bumble-black);
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-  .compat-label {
-    font-size: 12px;
-    color: var(--bumble-yellow);
-    font-weight: 700;
-    white-space: nowrap;
-  }
-  .compat-fill-track {
-    flex: 1;
-    height: 6px;
-    background: rgba(255,255,255,0.15);
-    border-radius: 3px;
-    overflow: hidden;
-  }
-  .compat-fill {
-    height: 100%;
-    background: var(--bumble-gradient);
-    border-radius: 3px;
-    transition: width 1s ease;
-  }
-  .compat-percent {
-    font-size: 14px;
-    font-weight: 800;
-    color: white;
+    display: none;
   }
 
   .profile-action-bar {
     display: flex;
     justify-content: center;
-    gap: 32px;
-    padding: 16px 0 40px;
+    gap: 80px;
+    padding: 24px 0 12px;
     background: var(--bumble-black);
+    border-top: 1px solid rgba(255,255,255,0.08);
   }
   .profile-action-btn {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.2);
-    background: transparent;
+    border: none;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -503,9 +572,15 @@
   .profile-action-btn:hover {
     transform: scale(1.1);
   }
-  .profile-action-btn.nope:hover { border-color: var(--bumble-red); background: rgba(255,68,88,0.15); }
-  .profile-action-btn.yep:hover { border-color: var(--bumble-green); background: rgba(33,208,122,0.15); }
-  .profile-action-btn svg { width: 28px; height: 28px; }
+  .profile-action-btn.nope {
+    background: #FFB6C1;
+  }
+  .profile-action-btn.nope:hover { background: #FF9AAB; }
+  .profile-action-btn.yep {
+    background: var(--bumble-yellow);
+  }
+  .profile-action-btn.yep:hover { background: var(--bumble-dark-yellow); }
+  .profile-action-btn svg { width: 36px; height: 36px; }
 
   /* Confirmation Screen */
   .screen-confirm {
@@ -1197,6 +1272,21 @@
     margin-bottom: 28px;
   }
 
+  /* Home Indicator */
+  .home-indicator {
+    width: 100%;
+    padding: 8px 0 6px;
+    display: flex;
+    justify-content: center;
+    background: var(--bumble-black);
+  }
+  .home-indicator-bar {
+    width: 134px;
+    height: 5px;
+    background: rgba(255,255,255,0.4);
+    border-radius: 3px;
+  }
+
   /* Animations */
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -1321,66 +1411,60 @@
   <!-- SCREEN 1: HOME -->
   <!-- ============================================ -->
   <div class="screen screen-home active" id="screen-home">
-    <div class="status-bar">
-      <span class="time">9:41</span>
-      <span class="icons">
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
-        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+    <div class="status-bar" style="background:var(--bumble-white);color:var(--bumble-black);">
+      <span class="time">9:30</span>
+      <div style="position:absolute;left:50%;transform:translateX(-50%);bottom:6px;width:24px;height:24px;border-radius:50%;background:#1A1A1A;display:flex;align-items:center;justify-content:center;">
+        <div style="width:12px;height:12px;border-radius:50%;background:white;"></div>
+      </div>
+      <span class="icons" style="display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path fill="currentColor" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path fill="currentColor" d="M2 22h20V2z"/></svg>
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="2" y="6" width="18" height="12" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><rect x="4" y="8" width="6" height="8" rx="1" fill="currentColor"/><rect x="21" y="10" width="2" height="4" rx="0.5" fill="currentColor"/></svg>
       </span>
     </div>
 
-    <div class="home-header">
-      <div class="logo">bumble</div>
-      <div class="header-icons">
-        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 22c1.1 0 2-.9 2-2h-4a2 2 0 002 2zm6-6v-5c0-3.07-1.63-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.64 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"/></svg>
-        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-      </div>
-    </div>
-
-    <div class="home-tabs">
-      <div class="tab active">Date</div>
-      <div class="tab">BFF</div>
-      <div class="tab">Bizz</div>
-    </div>
-
-    <div class="home-card-area">
-      <div class="profile-card-stack">
-        <div class="profile-photo-placeholder profile-color-5">
-          <div class="card-avatar">
-            <div style="width:85%;height:90%;border-radius:16px;background:linear-gradient(180deg,rgba(0,0,0,0) 50%,rgba(0,0,0,0.5) 100%),linear-gradient(135deg, #fa709a 0%, #fee140 100%);display:flex;align-items:flex-end;padding:20px;">
-              <div>
-                <div style="font-size:26px;font-weight:800;color:white;">Sarah, 27</div>
-                <div style="font-size:14px;color:rgba(255,255,255,0.85);margin-top:4px;">UX Designer at Google</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="card-actions">
-      <button class="card-action-btn pass">
-        <svg viewBox="0 0 24 24"><path fill="#FF4458" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+    <!-- Top Tab Bar -->
+    <div class="top-tab-bar">
+      <button class="top-tab-pill active">People</button>
+      <button class="top-tab-icon wave-icon" title="Buzz Meetup" onclick="triggerBuzzAlert()">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M7.5 14.5c-1-1.5-1.5-3.5-1-5.5M4.5 16c-1.5-2.5-2-5.5-1-8.5" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/><path d="M10 13V6.5a1.5 1.5 0 013 0V11M13 11V5a1.5 1.5 0 013 0v6M16 11V6.5a1.5 1.5 0 013 0V14c0 3.5-2.5 6-6 6h-1c-3 0-5.5-2-6.5-5l-.5-1c-.5-1 0-2 1-2.5s2 0 2.5 1l.5 1" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       </button>
-      <button class="card-action-btn like">
-        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+      <button class="top-tab-icon filter-icon">
+        <svg viewBox="0 0 24 24"><path fill="white" d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+      </button>
+      <button class="top-tab-pill inactive" onclick="goToProfiles()">Groups</button>
+      <button class="top-tab-icon search-icon">
+        <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" stroke="#8C8C8C" stroke-width="2.5" fill="none"/><path d="M16.5 16.5L21 21" stroke="#8C8C8C" stroke-width="2.5" stroke-linecap="round"/></svg>
       </button>
     </div>
 
-    <div class="bottom-nav">
-      <div class="nav-item active">
-        <svg viewBox="0 0 24 24"><path fill="#1A1A1A" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
-        <span class="nav-label">Date</span>
-      </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>
-        <span class="nav-label">Chats</span>
-      </div>
-      <div class="nav-item">
-        <svg viewBox="0 0 24 24"><path fill="#8C8C8C" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
-        <span class="nav-label">Profile</span>
-      </div>
+    <!-- Scrollable People Feed -->
+    <div class="people-feed" id="peopleFeed"></div>
+
+    <!-- Bottom Nav (5 tabs) -->
+    <div class="bottom-nav-5">
+      <button class="bnav-item active">
+        <svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2"/><path d="M16.5 16.5L21 21" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="bnav-label">People</span>
+      </button>
+      <button class="bnav-item">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="9" cy="7" r="4" stroke="currentColor" stroke-width="2"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+        <span class="bnav-label">Groups</span>
+      </button>
+      <button class="bnav-item">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="bnav-label">Chats</span>
+      </button>
+      <button class="bnav-item">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9zM13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span class="bnav-label">Activity</span>
+      </button>
+      <button class="bnav-item">
+        <svg viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="7" r="4" stroke="currentColor" stroke-width="2"/></svg>
+        <span class="bnav-label">Me</span>
+      </button>
     </div>
+    <div class="home-indicator-light"><div class="home-indicator-bar"></div></div>
 
     <!-- Alert Overlay -->
     <div class="alert-overlay" id="alert-overlay">
@@ -1402,16 +1486,15 @@
   <!-- ============================================ -->
   <div class="screen screen-profiles" id="screen-profiles">
     <div class="status-bar" style="background:var(--bumble-black);color:white;">
-      <span class="time" style="color:white;">9:41</span>
-      <span class="icons">
-        <svg viewBox="0 0 24 24"><path fill="white" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
-        <svg viewBox="0 0 24 24"><path fill="white" d="M15.67 4H14V2h-4v2H8.33C7.6 4 7 4.6 7 5.33v15.33C7 21.4 7.6 22 8.33 22h7.33c.74 0 1.34-.6 1.34-1.33V5.33C17 4.6 16.4 4 15.67 4z"/></svg>
+      <span class="time" style="color:white;">9:30</span>
+      <span class="icons" style="display:flex;align-items:center;gap:6px;">
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path fill="white" d="M1 9l2 2c4.97-4.97 13.03-4.97 18 0l2-2C16.93 2.93 7.08 2.93 1 9zm8 8l3 3 3-3a4.237 4.237 0 00-6 0zm-4-4l2 2a7.074 7.074 0 0110 0l2-2C15.14 9.14 8.87 9.14 5 13z"/></svg>
+        <svg viewBox="0 0 24 24" style="width:16px;height:16px;"><path fill="white" d="M2 22h20V2z"/></svg>
+        <svg viewBox="0 0 24 24" style="width:18px;height:18px;"><rect x="2" y="6" width="18" height="12" rx="2" stroke="white" stroke-width="2" fill="none"/><rect x="4" y="8" width="6" height="8" rx="1" fill="white"/><rect x="21" y="10" width="2" height="4" rx="0.5" fill="white"/></svg>
       </span>
     </div>
 
     <div class="profiles-header">
-      <svg width="24" height="24" viewBox="0 0 24 24" style="cursor:pointer;" onclick="goToScreen('screen-home')"><path fill="white" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
-      <h3>Buzz Meetup</h3>
       <div class="profiles-progress" id="profiles-progress"></div>
     </div>
 
@@ -1425,15 +1508,13 @@
 
     <div class="profile-action-bar">
       <button class="profile-action-btn nope" onclick="nextProfile()">
-        <svg viewBox="0 0 24 24"><path fill="#FF4458" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-      </button>
-      <button class="profile-action-btn" style="border-color:rgba(255,198,41,0.4);" onclick="nextProfile()">
-        <svg viewBox="0 0 24 24"><path fill="#FFC629" d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="#1A1A1A" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
       </button>
       <button class="profile-action-btn yep" onclick="nextProfile()">
-        <svg viewBox="0 0 24 24"><path fill="#21D07A" d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <svg viewBox="0 0 24 24" width="36" height="36"><path fill="#1A1A1A" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
       </button>
     </div>
+    <div class="home-indicator"><div class="home-indicator-bar"></div></div>
   </div>
 
   <!-- ============================================ -->
@@ -1703,12 +1784,20 @@
 
 <script>
   // ===== DATA =====
+  const feedPeople = [
+    { name: "Yvonne A.", age: 30, location: "Shadyside, Pittsburgh", bio: "Hi! I'm Yvonne and I just moved here! I'm looking for new friends who love craft...", color: 5, tags: ["Traveling", "Concerts", "Boba", "Painting"] },
+    { name: "Ruby M.", age: 24, location: "Squirrel Hill, Pittsburgh", bio: "Ruby here! I'm new to the area and am looking for some cool people to hang...", color: 2, tags: ["Cooking", "Coffee", "Skateboarding", "Camping"] },
+    { name: "Jill D.", age: 22, location: "Shadyside, Pittsburgh", bio: "Beep beep! New friend coming through! Let's be best friends! I love music, ...", color: 3, tags: ["Music", "EDM", "Dancing", "Raves", "Video Games"] },
+    { name: "Brittany J.", age: 35, location: "Shadyside, Pittsburgh", bio: "I love tacos, traveling, and wine!", color: 1, tags: ["Tacos", "Traveling", "Wine", "NYC", "Cats"] },
+    { name: "Kira L.", age: 27, location: "Lawrenceville, Pittsburgh", bio: "Dog mom, coffee addict, and aspiring plant lady. Let's go on an adventure!", color: 4, tags: ["Dogs", "Coffee", "Plants", "Hiking", "Art"] },
+  ];
+
   const profiles = [
-    { name: "Maya", age: 25, job: "Graphic Designer", compat: 87, color: 1, tags: ["Art Lover", "Coffee Addict", "Hiking"], matchTag: "Music" },
-    { name: "Jordan", age: 28, job: "Software Engineer", compat: 92, color: 2, tags: ["Foodie", "Rock Climbing", "Travel"], matchTag: "Dogs" },
-    { name: "Liam", age: 26, job: "Marketing Manager", compat: 78, color: 3, tags: ["Photography", "Running", "Cooking"], matchTag: "Fitness" },
-    { name: "Ava", age: 24, job: "Nurse Practitioner", compat: 85, color: 4, tags: ["Yoga", "Reading", "Wine"], matchTag: "Wellness" },
-    { name: "Ethan", age: 29, job: "Architect", compat: 81, color: 5, tags: ["Design", "Cycling", "Jazz"], matchTag: "Creativity" }
+    { name: "Brittany J.", age: 35, location: "Shadyside, Pittsburgh", bio: "I love tacos, traveling, and wine!", compat: 87, color: 5, tags: ["Tacos", "Traveling", "Wine", "NYC", "Cats"] },
+    { name: "Maya R.", age: 25, location: "Squirrel Hill, Pittsburgh", bio: "Art nerd who loves a good latte and hiking trails.", compat: 92, color: 1, tags: ["Art", "Coffee", "Hiking", "Music", "Dogs"] },
+    { name: "Jordan K.", age: 28, location: "Lawrenceville, Pittsburgh", bio: "Foodie and rock climber. Let's explore!", compat: 78, color: 2, tags: ["Foodie", "Climbing", "Travel", "Dogs", "Camping"] },
+    { name: "Liam T.", age: 26, location: "Oakland, Pittsburgh", bio: "Runner, photographer, and aspiring home chef.", compat: 85, color: 3, tags: ["Photography", "Running", "Cooking", "Fitness", "Music"] },
+    { name: "Ava M.", age: 24, location: "South Side, Pittsburgh", bio: "Yoga lover, bookworm, and wine enthusiast.", compat: 81, color: 4, tags: ["Yoga", "Reading", "Wine", "Wellness", "Travel"] }
   ];
 
   let currentProfile = 0;
@@ -1717,6 +1806,7 @@
 
   // ===== INIT =====
   function init() {
+    buildPeopleFeed();
     buildAlertAvatars();
     buildProfiles();
     buildGroupPreview();
@@ -1727,6 +1817,44 @@
     setTimeout(() => {
       document.getElementById('alert-overlay').classList.add('show');
     }, 1500);
+  }
+
+  // ===== PEOPLE FEED =====
+  function buildPeopleFeed() {
+    const feed = document.getElementById('peopleFeed');
+    feed.innerHTML = '';
+
+    feedPeople.forEach((p) => {
+      const card = document.createElement('div');
+      card.className = 'feed-card';
+      card.innerHTML = `
+        <div class="feed-card-photo-placeholder profile-color-${p.color}">
+          <span style="font-size:120px;color:rgba(255,255,255,0.25);font-weight:900;">${p.name[0]}</span>
+        </div>
+        <div class="feed-card-overlay">
+          <div class="feed-card-top-gradient"></div>
+          <div class="feed-card-bottom-gradient"></div>
+        </div>
+        <div class="feed-card-info-top">
+          <div class="feed-card-name">${p.name}</div>
+          <div class="feed-card-location">${p.age} &bull; ${p.location}</div>
+        </div>
+        <div class="feed-card-info-bottom">
+          <div class="feed-card-bio">${p.bio}</div>
+          <button class="feed-card-wave" onclick="event.stopPropagation();" title="Wave">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M7.5 14.5c-1-1.5-1.5-3.5-1-5.5M4.5 16c-1.5-2.5-2-5.5-1-8.5" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round"/><path d="M10 13V6.5a1.5 1.5 0 013 0V11M13 11V5a1.5 1.5 0 013 0v6M16 11V6.5a1.5 1.5 0 013 0V14c0 3.5-2.5 6-6 6h-1c-3 0-5.5-2-6.5-5l-.5-1c-.5-1 0-2 1-2.5s2 0 2.5 1l.5 1" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <div class="feed-card-tags">
+            ${p.tags.map(t => `<span class="feed-card-tag">${t}</span>`).join('')}
+          </div>
+        </div>
+      `;
+      feed.appendChild(card);
+    });
+  }
+
+  function triggerBuzzAlert() {
+    document.getElementById('alert-overlay').classList.add('show');
   }
 
   function buildAlertAvatars() {
@@ -1758,12 +1886,17 @@
             <span style="font-size:140px;color:rgba(255,255,255,0.3);font-weight:900;">${p.name[0]}</span>
           </div>
           <div class="profile-gradient"></div>
+          <div class="profile-gradient-bottom"></div>
           <div class="profile-details">
-            <div class="name-age">${p.name}, ${p.age}</div>
-            <div class="occupation">${p.job}</div>
-            <div class="profile-tags">
-              ${p.tags.map(t => `<span class="profile-tag">${t}</span>`).join('')}
-              <span class="profile-tag match">${p.matchTag}</span>
+            <div class="profile-top-info">
+              <div class="name-age">${p.name}</div>
+              <div class="occupation">${p.age} &bull; ${p.location}</div>
+            </div>
+            <div class="profile-bottom-info">
+              <div class="bio-text">${p.bio}</div>
+              <div class="profile-tags">
+                ${p.tags.map(t => `<span class="profile-tag">${t}</span>`).join('')}
+              </div>
             </div>
           </div>
         </div>
@@ -1981,8 +2114,17 @@
   function restart() {
     clearInterval(timerInterval);
     currentProfile = 0;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    document.getElementById('screen-home').classList.add('active');
+    document.querySelectorAll('.screen').forEach(s => {
+      s.classList.remove('active');
+      s.style.display = '';
+      s.style.opacity = '';
+      s.style.transform = '';
+    });
+    const home = document.getElementById('screen-home');
+    home.classList.add('active');
+    home.style.display = 'flex';
+    home.style.opacity = '1';
+    home.style.transform = 'translateX(0)';
     document.getElementById('alert-overlay').classList.remove('show');
 
     setTimeout(() => {
